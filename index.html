@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Fang</title>
+</head>
+<body id="body">
+    <input type="text" id="User_Id" placeholder="Username">
+    <input type="password" id="User_PW" placeholder="Password"><br>
+    <input type="text" id="Nurse_Id" placeholder="Nurse ID"><br>
+
+    <input type="button" id="send" value="Send">
+</body>
+</html>
+<script src="./nm.js"></script>
+<script>
+	$(DOCTYPEocument).ready(function(){
+		$('#User_PW').keypress(function(e){
+			if(e.keyCode==13)
+			$('#send').click();
+		});
+	});
+</script>
