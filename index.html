@@ -3,21 +3,40 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Fang</title>
+	<link rel="stylesheet" href="./index.css">
 </head>
 <body id="body">
-    <input type="text" id="User_Id" placeholder="Username">
-    <input type="password" id="User_PW" placeholder="Password"><br>
-    <input type="text" id="Nurse_Id" placeholder="Nurse ID"><br>
-
-    <input type="button" id="send" value="Send">
+	<div id="div_login">
+		<input type="text" id="User_Id" placeholder="Username" autofocus>
+		<input type="password" id="User_PW" placeholder="Password"><br>
+		<input type="button" id="login" value="Login">
+	</div>
+	<div id="div_search" style="display:none">
+		<input type="text" id="Nurse_Id" placeholder="Nurse ID"><br>
+		<input type="button" id="search" value="Search">
+	</div>
+	<div id="div_login_text" style="display:none">
+		Logining<span class="blink">……</span>
+	</div>
+	<div id="div_search_text" style="display:none">
+		Searching<span class="blink">……</span>
+	</div>
 </body>
 </html>
 <script src="./nm.js"></script>
 <script>
-	$(DOCTYPEocument).ready(function(){
-		$('#User_PW').keypress(function(e){
-			if(e.keyCode==13)
-			$('#send').click();
-		});
+	document.getElementById("User_PW")
+	.addEventListener("keyup", function(event) {
+		event.preventDefault();
+		if (event.keyCode == 13) {
+			document.getElementById("login").click();
+		}
+	});
+	document.getElementById("Nurse_Id")
+	.addEventListener("keyup", function(event) {
+		event.preventDefault();
+		if (event.keyCode == 13) {
+			document.getElementById("search").click();
+		}
 	});
 </script>

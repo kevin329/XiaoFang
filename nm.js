@@ -1,28 +1,46 @@
-const sendBtn = document.getElementById('send');
-const User_IdBtn = document.getElementById('User_Id');
-const User_PWBtn = document.getElementById('User_PW');
-const Nurse_IdBtn = document.getElementById('Nurse_Id');
+const loginBtn		= document.getElementById('login');
+const searchBtn		= document.getElementById('search');
+const User_IdIpt	= document.getElementById('User_Id');
+const User_PWIpt	= document.getElementById('User_PW');
+const Nurse_IdIpt	= document.getElementById('Nurse_Id');
 var User_Id, User_PW, Nurse_Id;
-sendBtn.addEventListener('click', function (event) {
-	User_Id = User_IdBtn.value;
-	User_PW = User_PWBtn.value;
-	Nurse_Id = Nurse_IdBtn.value;
+loginBtn.addEventListener('click', function (event) {
+	User_Id		= User_IdIpt.value;
+	User_PW		= User_PWIpt.value;
 	run_HTML_01();
 	run_NM_1();
 })
+searchBtn.addEventListener('click', function (event) {
+	Nurse_Id = Nurse_IdIpt.value;
+	run_HTML_03();
+	run_NM_2();
+})
 var run_HTML_01 = function () {
-	document.getElementById('body').innerHTML = '<h1>TEST</h1>';
-
+	document.getElementById("div_login").style.display = "none";
+	document.getElementById("div_login_text").style.display = "";
 }
-var run_HTML_02 = function (name) {
-	document.getElementById('body').innerHTML = 'Name:' + name;
+var run_HTML_02 = function (tf) {
+	if (tf) {
+		document.getElementById("div_login_text").style.display = "none";
+		document.getElementById("div_search").style.display = "";
+		document.getElementById('Nurse_Id').focus();
+	} else {
+		document.getElementById('body').innerHTML = 'Login failed';
+	}
+}
+var run_HTML_03 = function () {
+	document.getElementById("div_search").style.display = "none";
+	document.getElementById("div_search_text").style.display = "";
+}
+var run_HTML_04 = function (i, j) {
+	document.getElementById('body').innerHTML = 'Page ' + j + ' of ' + page_length + '<br>Fetching case No.' + (i+1) + '<br>Date：\t' + a_date[i] + '<br>Time1：\t' + a_time1[i] + '<br>Time2：\t' + a_time2[i] + '<br>Car No.：\t' + a_car_no[i];
 
 }
 var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
 var a_date = [], a_time1 = [], a_time2 = [], a_car_no= [], a_datong = [], a_nanshan = [];
-var cheerio = require("cheerio");
-var Nightmare = require('nightmare');
-var nightmare = Nightmare({ show: true,switches: {
+var cheerio		= require("cheerio");
+var Nightmare	= require('nightmare');
+var nightmare	= Nightmare({ show: false,switches: {
 		'ignore-certificate-errors': true
 	} });
 var run_NM_1 = function () {
@@ -34,29 +52,37 @@ var run_NM_1 = function () {
 		run_NM_1_2();
 	});
 }
-// run_NM_1();
 var run_NM_1_2 = function () {
 	nightmare
 	.wait('#User_Id')
-	.type('form[name=form1] [name=User_Id]', User_Id)
-	.type('form[name=form1] [name=User_PW]', User_PW)
-	.type('form[name=form1] [name=txtChkCode]', '')
-	.type('form[name=form1] [name=txtChkCode]', cookie)
-	.click('form[name=form1] input[name=btn_LogOk]')
-	.wait(2000);
+	.type('input[name=User_Id]', User_Id)
+	.type('input[name=User_PW]', User_PW)
+	.type('input[name=txtChkCode]', '')
+	.type('input[name=txtChkCode]', cookie)
+	.click('input[name=btn_LogOk]')
+	.wait(2000)
 	// .end();
-	nightmare.run(function () {
+	.then(function () {
 		target_dates();
-		run_NM_2();
+		run_NM_1_3();
+	});
+}
+var run_NM_1_3 = function () {
+	nightmare
+	.url()
+	.then(function (url) {
+		if (url == 'http://ems.mohw.gov.tw/pagemain.jsp') {
+			run_HTML_02(true);
+			target_dates();
+		} else {
+			run_HTML_02(false);
+		}
 	});
 }
 var run_NM_2 = function () {
 	nightmare
 	.goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
 	.wait('table.EmsFormTable')
-	.evaluate(function (id) {
-		// return document.querySelector('option[value=' + id + ']').innerHTML;
-	},{Nurse_Id})
 	.select("select[name='aid_start_year']", target_year1)
 	.select("select[name='aid_start_month']", target_month1)
 	.select("select[name='aid_start_day']", "01")
@@ -66,7 +92,6 @@ var run_NM_2 = function () {
 	.select('select[name="nurse_code"]', Nurse_Id)
 	.click('input[type="submit"]')
 	.then(function (result) {
-		run_HTML_02(result);
 		run_NM_3();
 	})
 	.catch(function (error) {
@@ -129,7 +154,8 @@ var run_NM_5 = function () {
 			a_time2[count_item - 1]		= time2;
 			a_car_no[count_item - 1]	= car_no;
 			console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no);
-
+			run_HTML_04(count_item - 1, page_cur);
+			
 			count_item++;
 			table_cur++;
 			if (table_cur == 12) {
