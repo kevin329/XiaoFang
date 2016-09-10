@@ -3,7 +3,10 @@ const searchBtn		= document.getElementById('search');
 const User_IdIpt	= document.getElementById('User_Id');
 const User_PWIpt	= document.getElementById('User_PW');
 const Nurse_IdIpt	= document.getElementById('Nurse_Id');
-var User_Id, User_PW, Nurse_Id;
+const YearSlt		= document.getElementById('year');
+const MonthSlt		= document.getElementById('month');
+const LengthSlt		= document.getElementById('length');
+var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length;
 loginBtn.addEventListener('click', function (event) {
 	User_Id		= User_IdIpt.value;
 	User_PW		= User_PWIpt.value;
@@ -11,9 +14,12 @@ loginBtn.addEventListener('click', function (event) {
 	run_NM_1();
 })
 searchBtn.addEventListener('click', function (event) {
-	Nurse_Id = Nurse_IdIpt.value;
+	Nurse_Id	= Nurse_IdIpt.value;
+	input_year	= YearSlt.value;
+	input_month	= MonthSlt.value;
+	input_length = LengthSlt.value;
+	target_dates();
 	run_HTML_03();
-	run_NM_2();
 })
 var run_HTML_01 = function () {
 	document.getElementById("div_login").style.display = "none";
@@ -21,11 +27,18 @@ var run_HTML_01 = function () {
 }
 var run_HTML_02 = function (tf) {
 	if (tf) {
+		var cur_month = new Date();
+		cur_month = cur_month.getMonth();
+		cur_month++;
 		document.getElementById("div_login_text").style.display = "none";
 		document.getElementById("div_search").style.display = "";
 		document.getElementById('Nurse_Id').focus();
+		document.querySelector('select#month option[value=\"' + cur_month + '\"]').selected = true;
 	} else {
-		document.getElementById('body').innerHTML = 'Login failed';
+		document.getElementById('msg').innerHTML = 'Login failed, please try again.';
+		document.getElementById("div_login_text").style.display = "none";
+		document.getElementById("div_login").style.display = "";
+		document.getElementById("div_msg").style.display = "";
 	}
 }
 var run_HTML_03 = function () {
@@ -63,7 +76,6 @@ var run_NM_1_2 = function () {
 	.wait(2000)
 	// .end();
 	.then(function () {
-		target_dates();
 		run_NM_1_3();
 	});
 }
@@ -73,7 +85,6 @@ var run_NM_1_3 = function () {
 	.then(function (url) {
 		if (url == 'http://ems.mohw.gov.tw/pagemain.jsp') {
 			run_HTML_02(true);
-			target_dates();
 		} else {
 			run_HTML_02(false);
 		}
@@ -195,38 +206,19 @@ var run_NM_7 = function () {
 	});
 }
 var target_dates = function () {
-	var cur_date	= new Date();
-	var cur_month	= cur_date.getMonth();
-	var cur_year	= cur_date.getFullYear() - 1911;
-	// if (args[1] && args[2]) {
-	// 	target_month1	= args[2]	- 1;
-	// 	target_year1	= args[1]	- 70;
-	// 	if (args[3] && args[3] <= 3) {
-	// 		target_month2	= target_month1 + args[3] - 1;
-	// 	} else {
-	// 		target_month2	= target_month1 + 3;
-	// 	}
-	// 	target_year2	= target_year1;
-	// 	if (target_month2 > 11) {
-	// 		target_month2	-= 12;
-	// 		target_year2	+= 1;
-	// 	}
-	// 	return true;
-	// } else { //Auto: last 4 month
-		target_month1	= cur_month	+ 1 - 1;
-		target_year1	= cur_year;
-		target_month2	= cur_month + 1;
-		target_year2	= cur_year;
-		if (target_month1 < 1) {
-			target_month1	+= 12;
-			target_year1	-= 1;
-		}
-		target_month1	= ('0' + target_month1).slice(-2);
-		target_month2	= ('0' + target_month2).slice(-2);
-		target_year1	= ('0' + target_year1).slice(-3);
-		target_year2	= ('0' + target_year2).slice(-3);
-		// return false;
-	// }
+	target_month1	= input_month;
+	target_year1	= input_year;
+	target_month2	= parseInt(input_month) + parseInt(input_length) - 1;
+	target_year2	= target_year1;
+	if (target_month2 > 12) {
+		target_month2	-= 12;
+		target_year2	+= 1;
+	}
+	target_month1	= ('0' + target_month1).slice(-2);
+	target_month2	= ('0' + target_month2).slice(-2);
+	target_year1	= ('0' + target_year1).slice(-3);
+	target_year2	= ('0' + target_year2).slice(-3);
+	run_NM_2();
 }
 var calc = function () {
 	var output_data_new = ['No.','Date','Out','In','Times','Datong','Nanshan','Overtime','If Nanshan\r\n'].join('\t');

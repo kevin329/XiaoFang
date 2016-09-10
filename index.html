@@ -4,21 +4,70 @@
 	<meta charset="UTF-8">
 	<title>Fang</title>
 	<link rel="stylesheet" href="./index.css">
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
 </head>
 <body id="body">
-	<div id="div_login">
-		<input type="text" id="User_Id" placeholder="Username" autofocus>
-		<input type="password" id="User_PW" placeholder="Password"><br>
-		<input type="button" id="login" value="Login">
+	<div id="div_login" class="container">
+		<form class="form-signin" style="max-width: 330px; padding: 15px; margin: 0 auto;">
+			<h2 class="form-signin-heading">Please sign in</h2>
+			<input type="text" id="User_Id" class="form-control" placeholder="Username" autofocus>
+			<input type="password" id="User_PW" class="form-control" placeholder="Password"><br>
+			<button type="button" id="login" class="btn btn-lg btn-primary btn-block">Login</button><br>
+			<div id="div_msg" class="alert alert-danger" role="alert" style="display:none">
+				<p id="msg"></p>
+			</div>
+		</form>
 	</div>
-	<div id="div_search" style="display:none">
-		<input type="text" id="Nurse_Id" placeholder="Nurse ID"><br>
-		<input type="button" id="search" value="Search">
+	<div id="div_search" class="container" style="display:none">
+		<form class="form-signin000" style="max-width: 500px; padding: 15px; margin: 0 auto;">
+			<label class="col-sm-3 control-label" for="Nurse_Id">Nurse ID</label>
+			<div class="col-sm-9">
+				<input type="text" id="Nurse_Id" class="form-control" placeholder="Nurse ID" value="F128662497">
+			</div>
+			<label class="col-sm-3 control-label" for="formGroupInputLarge">Year</label>
+			<div class="col-sm-9">
+				<select class="form-control" id="year">
+					<!-- <option value="104">104</option> -->
+					<option value="105">105</option>
+					<option value="106">106</option>
+				</select>
+			</div>
+			<label class="col-sm-3 control-label" for="formGroupInputLarge">Month</label>
+			<div class="col-sm-9">
+				<select class="form-control" id="month">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+				</select>
+			</div>
+			<label class="col-sm-3 control-label" for="formGroupInputLarge">Length</label>
+			<div class="col-sm-9">
+				<select class="form-control" id="length">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+			</div>
+			<div class="col-sm-12">
+				<br>
+				<button type="button" id="search" class="btn btn-lg btn-primary btn-block">Search</button>
+			</div>
+		</form>
 	</div>
-	<div id="div_login_text" style="display:none">
+	<div id="div_login_text" class="container" style="display:none">
 		Logining<span class="blink">……</span>
 	</div>
-	<div id="div_search_text" style="display:none">
+	<div id="div_search_text" class="container" style="display:none">
 		Searching<span class="blink">……</span>
 	</div>
 </body>
@@ -30,13 +79,6 @@
 		event.preventDefault();
 		if (event.keyCode == 13) {
 			document.getElementById("login").click();
-		}
-	});
-	document.getElementById("Nurse_Id")
-	.addEventListener("keyup", function(event) {
-		event.preventDefault();
-		if (event.keyCode == 13) {
-			document.getElementById("search").click();
 		}
 	});
 </script>
