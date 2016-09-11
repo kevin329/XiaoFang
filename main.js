@@ -30,8 +30,8 @@ app.on('ready', function() {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // 打開開發者工具
-  // mainWindow.webContents.openDevTools();
-
+  mainWindow.webContents.openDevTools();
+  mainWindow.setMenu(null);
   // 當window 被關閉，這個事件會被觸發
   mainWindow.on('closed', function() {
     // 取消引用 window 物件，如果你的應用程式支援多視窗的話，
@@ -44,6 +44,7 @@ app.on('ready', function() {
 ipc.on('save-dialog', function (event) {
   const options = {
     title: '另存新檔',
+    defaultPath: '%USERPROFILE%\\Desktop\\overtime.tsv',
     filters: [
       { name: 'Tab-separated values', extensions: ['tsv'] }
     ]

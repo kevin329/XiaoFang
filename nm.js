@@ -13,7 +13,7 @@ var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length;
 loginBtn.addEventListener('click', function (event) {
 	User_Id		= User_IdIpt.value;
 	User_PW		= User_PWIpt.value;
-	run_HTML_01();
+	WEB_01();
 	run_NM_1();
 })
 searchBtn.addEventListener('click', function (event) {
@@ -22,10 +22,10 @@ searchBtn.addEventListener('click', function (event) {
 	input_month	= MonthSlt.value;
 	input_length = LengthSlt.value;
 	target_dates();
-	run_HTML_03();
+	WEB_03();
 })
 searchABtn.addEventListener('click', function (event) {
-	run_HTML_02(true);
+	WEB_02(true);
 	var num = document.getElementById("table_result").rows.length;
 	for (var i = 1; i < num; i++) {
 		document.getElementById("table_result").deleteRow(-1);
@@ -41,11 +41,11 @@ ipc.on('saved-file', function (event, path) {
 		calc(path);
 	}
 })
-var run_HTML_01 = function () {
+var WEB_01 = function () {
 	document.getElementById("div_login").style.display = "none";
 	document.getElementById("div_login_text").style.display = "";
 }
-var run_HTML_02 = function (tf) {
+var WEB_02 = function (tf) {
 	if (tf) {
 		var cur_month = new Date();
 		cur_month = cur_month.getMonth();
@@ -62,11 +62,11 @@ var run_HTML_02 = function (tf) {
 		document.getElementById("div_msg").style.display = "";
 	}
 }
-var run_HTML_03 = function () {
+var WEB_03 = function () {
 	document.getElementById("div_search").style.display = "none";
 	document.getElementById("div_search_text").style.display = "";
 }
-var run_HTML_04 = function (i, j) {
+var WEB_04 = function (i, j) {
 	document.getElementById("div_search_text").style.display = "none";
 	document.getElementById("div_search_result").style.display = "";
 
@@ -95,11 +95,28 @@ var run_HTML_04 = function (i, j) {
 		document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'info';
 	}
 }
+var WEB_05_NO_RESULT = function () {
+	document.getElementById("div_search_text").style.display = "none";
+	document.getElementById("div_search_result").style.display = "";
+	var tr = document.getElementById("table_result").insertRow(1);
+	var td;
+	td = tr.insertCell(-1);
+	td.innerHTML = 'No case found.';
+	document.querySelector('tr:nth-child(2) td').colSpan = '9';
+}
+var WEB_06_RESET = function () {
+	document.getElementById("div_login").style.display = "";
+	document.getElementById("div_login_text").style.display = "none";
+	document.getElementById("div_search").style.display = "none";
+	document.getElementById("div_search_text").style.display = "none";
+	document.getElementById("div_search_result").style.display = "none";
+	run_NM_1();
+}
 var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
 var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_datong = [], a_nanshan = [];
 var cheerio		= require("cheerio");
 var Nightmare	= require('nightmare');
-var nightmare	= Nightmare({ show: false,switches: {
+var nightmare	= Nightmare({ show: false, typeInterval: 20, switches: {
 		'ignore-certificate-errors': true
 	} });
 var run_NM_1 = function () {
@@ -109,6 +126,10 @@ var run_NM_1 = function () {
 	.then(function (cookies) {
 		cookie = cookies[1]['value'];
 		run_NM_1_2();
+	})
+	.catch(function (error) {
+		console.error('Search failed:', error);
+		WEB_06_RESET();
 	});
 }
 var run_NM_1_2 = function () {
@@ -122,6 +143,9 @@ var run_NM_1_2 = function () {
 	.wait(2000)
 	.then(function () {
 		run_NM_1_3();
+	})
+	.catch(function (error) {
+		console.error('Search failed:', error);
 	});
 }
 var run_NM_1_3 = function () {
@@ -129,10 +153,13 @@ var run_NM_1_3 = function () {
 	.url()
 	.then(function (url) {
 		if (url == 'http://ems.mohw.gov.tw/pagemain.jsp') {
-			run_HTML_02(true);
+			WEB_02(true);
 		} else {
-			run_HTML_02(false);
+			WEB_02(false);
 		}
+	})
+	.catch(function (error) {
+		console.error('Search failed:', error);
 	});
 }
 var run_NM_2 = function () {
@@ -148,7 +175,24 @@ var run_NM_2 = function () {
 	.select('select[name="nurse_code"]', Nurse_Id)
 	.click('input[type="submit"]')
 	.then(function (result) {
-		run_NM_3();
+		run_NM_2_1();
+	})
+	.catch(function (error) {
+		console.error('Search failed:', error);
+	});
+}
+var run_NM_2_1 = function () { /******************* CHECK IF NO RESULT **********************/
+	nightmare
+	.wait('table.EmsDataTable')
+	.evaluate(function () {
+		return document.querySelector('table.EmsDataTable').getElementsByTagName('tr').length;
+	})
+	.then(function (result) {
+		if (result == 1) {
+			WEB_05_NO_RESULT();
+		} else {
+			run_NM_3();
+		}
 	})
 	.catch(function (error) {
 		console.error('Search failed:', error);
@@ -210,7 +254,7 @@ var run_NM_5 = function () {
 			a_time2[count_item - 1]		= time2;
 			a_car_no[count_item - 1]	= car_no;
 			console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no);
-			run_HTML_04(count_item - 1, page_cur);
+			WEB_04(count_item - 1, page_cur);
 			
 			count_item++;
 			table_cur++;

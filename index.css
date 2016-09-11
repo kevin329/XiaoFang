@@ -7,6 +7,11 @@
 		visibility: hidden;
 	}
 }
+#body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #EEEEEE;
+}
 .form-signin .form-control {
   position: relative;
   height: auto;
