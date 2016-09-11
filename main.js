@@ -5,6 +5,10 @@ const {app} = require('electron')
 const {BrowserWindow} = require('electron')
 // 保持一個對於 window 物件的全域的引用，不然，當 JavaScript 被GC，
 // window 會被自動地關閉
+
+const ipc = require('electron').ipcMain
+const dialog = require('electron').dialog
+
 var mainWindow = null;
 
 // 當所有窗口被關閉了，退出。
@@ -36,3 +40,15 @@ app.on('ready', function() {
     mainWindow = null;
   });
 });
+
+ipc.on('save-dialog', function (event) {
+  const options = {
+    title: '另存新檔',
+    filters: [
+      { name: 'Tab-separated values', extensions: ['tsv'] }
+    ]
+  }
+  dialog.showSaveDialog(options, function (filename) {
+    event.sender.send('saved-file', filename)
+  })
+})

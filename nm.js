@@ -1,11 +1,14 @@
 const loginBtn		= document.getElementById('login');
 const searchBtn		= document.getElementById('search');
+const searchABtn	= document.getElementById('search_again');
 const User_IdIpt	= document.getElementById('User_Id');
 const User_PWIpt	= document.getElementById('User_PW');
 const Nurse_IdIpt	= document.getElementById('Nurse_Id');
 const YearSlt		= document.getElementById('year');
 const MonthSlt		= document.getElementById('month');
 const LengthSlt		= document.getElementById('length');
+const ipc			= require('electron').ipcRenderer;
+const saveBtn		= document.getElementById('save_button');
 var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length;
 loginBtn.addEventListener('click', function (event) {
 	User_Id		= User_IdIpt.value;
@@ -21,6 +24,23 @@ searchBtn.addEventListener('click', function (event) {
 	target_dates();
 	run_HTML_03();
 })
+searchABtn.addEventListener('click', function (event) {
+	run_HTML_02(true);
+	var num = document.getElementById("table_result").rows.length;
+	for (var i = 1; i < num; i++) {
+		document.getElementById("table_result").deleteRow(-1);
+	}
+	a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_datong = [], a_nanshan = [];
+	count_item = 1;
+})
+saveBtn.addEventListener('click', function (event) {
+  ipc.send('save-dialog')
+})
+ipc.on('saved-file', function (event, path) {
+	if (path) {
+		calc(path);
+	}
+})
 var run_HTML_01 = function () {
 	document.getElementById("div_login").style.display = "none";
 	document.getElementById("div_login_text").style.display = "";
@@ -32,6 +52,7 @@ var run_HTML_02 = function (tf) {
 		cur_month++;
 		document.getElementById("div_login_text").style.display = "none";
 		document.getElementById("div_search").style.display = "";
+		document.getElementById("div_search_result").style.display = "none";
 		document.getElementById('Nurse_Id').focus();
 		document.querySelector('select#month option[value=\"' + cur_month + '\"]').selected = true;
 	} else {
@@ -46,11 +67,36 @@ var run_HTML_03 = function () {
 	document.getElementById("div_search_text").style.display = "";
 }
 var run_HTML_04 = function (i, j) {
-	document.getElementById('body').innerHTML = 'Page ' + j + ' of ' + page_length + '<br>Fetching case No.' + (i+1) + '<br>Date：\t' + a_date[i] + '<br>Time1：\t' + a_time1[i] + '<br>Time2：\t' + a_time2[i] + '<br>Car No.：\t' + a_car_no[i];
+	document.getElementById("div_search_text").style.display = "none";
+	document.getElementById("div_search_result").style.display = "";
 
+	var num = document.getElementById("table_result").rows.length;
+	var Tr = document.getElementById("table_result").insertRow(num);
+	var Td;
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = (i + 1);
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = a_date[i];
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = a_time1[i];
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = a_time2[i];
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = calc_E(i);
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = calc_F(i);
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = calc_G(i);
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = calc_H(i);
+	Td = Tr.insertCell(-1);
+	Td.innerHTML = calc_I(i);
+	if (calc_H(i) > 0) {
+		document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'info';
+	}
 }
 var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
-var a_date = [], a_time1 = [], a_time2 = [], a_car_no= [], a_datong = [], a_nanshan = [];
+var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_datong = [], a_nanshan = [];
 var cheerio		= require("cheerio");
 var Nightmare	= require('nightmare');
 var nightmare	= Nightmare({ show: false,switches: {
@@ -74,7 +120,6 @@ var run_NM_1_2 = function () {
 	.type('input[name=txtChkCode]', cookie)
 	.click('input[name=btn_LogOk]')
 	.wait(2000)
-	// .end();
 	.then(function () {
 		run_NM_1_3();
 	});
@@ -187,7 +232,7 @@ var run_NM_6 = function () { /******************* GO BACK **********************
 		if (table_cur == 12 && !(page_cur > page_length)) { //change page
 			run_NM_4();
 		} else if(table_cur == (table_length + 1) && page_cur == page_length) {
-			run_NM_7();
+			// run_NM_7();
 		} else {
 			run_NM_5();
 		}
@@ -196,15 +241,14 @@ var run_NM_6 = function () { /******************* GO BACK **********************
 		console.error('Search failed:', error);
 	});
 }
-var run_NM_7 = function () {
-	calc();
-	console.log("DONE! PLEEASE CHECK THE FILE");
-	nightmare
-	.end()
-	.then(function () {
-
-	});
-}
+// var run_NM_7 = function () {
+	// calc();
+	// console.log('DONE! PLEEASE CHECK THE FILE');
+	// nightmare
+	// .end()
+	// .then(function () {
+	// });
+// }
 var target_dates = function () {
 	target_month1	= input_month;
 	target_year1	= input_year;
@@ -220,22 +264,21 @@ var target_dates = function () {
 	target_year2	= ('0' + target_year2).slice(-3);
 	run_NM_2();
 }
-var calc = function () {
-	var output_data_new = ['No.','Date','Out','In','Times','Datong','Nanshan','Overtime','If Nanshan\r\n'].join('\t');
+var calc = function (path) {
+	var output_data = ['No.','Date','Out','In','Times','D.T.','N.S.','Overtime','If N.S.\r\n'].join('\t');
 	for (var i = 0; i < a_date.length; i++) {
-		output_data_new = output_data_new + [(i + 1), a_date[i], a_time1[i], a_time2[i], calc_E(i), calc_F(i), calc_G(i), calc_H(i), calc_I(i)].join('\t') + "\r\n";
+		output_data = output_data + [(i + 1), a_date[i], a_time1[i], a_time2[i], calc_E(i), calc_F(i), calc_G(i), calc_H(i), calc_I(i)].join('\t') + "\r\n";
 	}
 	var fs = require('fs');
-	fs.writeFile('output_data_NODE.tsv', output_data_new, function(error){ 
+	fs.writeFile(path, output_data, function(error){ 
 		if(error){
 			console.log('檔案寫入錯誤');
 		}
 	});
-	return true;
 }
 var calc_E = function (i) {
-	var e_time1 = new Date('1992/01/01 ' + a_time1[i] + ':00').getTime();
-	var e_time2 = new Date('1992/01/01 ' + a_time2[i] + ':00').getTime();
+	var e_time1 = new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
+	var e_time2 = new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
 	var e_time3 = new Date();
 	if (e_time2 > e_time1) {
 		e_time3.setTime(e_time2 - e_time1);
@@ -246,11 +289,11 @@ var calc_E = function (i) {
 	}
 }
 var calc_F = function (i) {
-	var e_time1		= new Date('1992/01/01 ' + a_time1[i] + ':00').getTime();
-	var e_time2		= new Date('1992/01/01 ' + a_time2[i] + ':00').getTime();
+	var e_time1		= new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
+	var e_time2		= new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
 	var e_time3		= new Date();
-	var e_time08	= new Date('1992/01/01 08:00:00').getTime();
-	var e_time18	= new Date('1992/01/01 18:00:00').getTime();
+	var e_time08	= new Date('1992/08/30 08:00:00').getTime();
+	var e_time18	= new Date('1992/08/30 18:00:00').getTime();
 	if (a_car_no[i] != '215') {
 		if (e_time1 < e_time08 || e_time1 > e_time18 || e_time2 < e_time08 || e_time2 > e_time18) {
 			if (e_time1 < e_time18 && e_time2 > e_time18) {
@@ -276,10 +319,10 @@ var calc_F = function (i) {
 	} 
 }
 var calc_G = function (i) {
-	var e_time1		= new Date('1992/01/01 ' + a_time1[i] + ':00').getTime();
-	var e_time2		= new Date('1992/01/01 ' + a_time2[i] + ':00').getTime();
+	var e_time1		= new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
+	var e_time2		= new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
 	var e_time3		= new Date();
-	var e_time08	= new Date('1992/01/01 08:00:00').getTime();
+	var e_time08	= new Date('1992/08/30 08:00:00').getTime();
 	if (a_car_no[i] == '215') {
 		if (e_time1 < e_time08 || e_time2 < e_time08) {
 			if (e_time1 > e_time08 && e_time2 <= e_time08) {
