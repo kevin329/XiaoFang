@@ -1,6 +1,7 @@
 const loginBtn		= document.getElementById('login');
 const searchBtn		= document.getElementById('search');
-const searchABtn	= document.getElementById('search_again');
+const researchBtn	= document.getElementById('search_again');
+const saveBtn		= document.getElementById('save_button');
 const User_IdIpt	= document.getElementById('User_Id');
 const User_PWIpt	= document.getElementById('User_PW');
 const Nurse_IdIpt	= document.getElementById('Nurse_Id');
@@ -8,8 +9,15 @@ const YearSlt		= document.getElementById('year');
 const MonthSlt		= document.getElementById('month');
 const LengthSlt		= document.getElementById('length');
 const ipc			= require('electron').ipcRenderer;
-const saveBtn		= document.getElementById('save_button');
 var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length;
+var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
+var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [], a_datong = [], a_nanshan = [];
+var cheerio		= require("cheerio");
+var Nightmare	= require('nightmare');
+var nightmare	= Nightmare({ show: false, typeInterval: 20, switches: {
+		'ignore-certificate-errors': true
+	} });
+
 loginBtn.addEventListener('click', function (event) {
 	User_Id		= User_IdIpt.value;
 	User_PW		= User_PWIpt.value;
@@ -17,20 +25,20 @@ loginBtn.addEventListener('click', function (event) {
 	run_NM_1();
 })
 searchBtn.addEventListener('click', function (event) {
-	Nurse_Id	= Nurse_IdIpt.value;
-	input_year	= YearSlt.value;
-	input_month	= MonthSlt.value;
-	input_length = LengthSlt.value;
+	Nurse_Id		= Nurse_IdIpt.value;
+	input_year		= YearSlt.value;
+	input_month		= MonthSlt.value;
+	input_length	= LengthSlt.value;
 	target_dates();
 	WEB_03();
 })
-searchABtn.addEventListener('click', function (event) {
+researchBtn.addEventListener('click', function (event) {
 	WEB_02(true);
 	var num = document.getElementById("table_result").rows.length;
 	for (var i = 1; i < num; i++) {
 		document.getElementById("table_result").deleteRow(-1);
 	}
-	a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_datong = [], a_nanshan = [];
+	a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [], a_datong = [], a_nanshan = [];
 	count_item = 1;
 })
 saveBtn.addEventListener('click', function (event) {
@@ -38,7 +46,7 @@ saveBtn.addEventListener('click', function (event) {
 })
 ipc.on('saved-file', function (event, path) {
 	if (path) {
-		calc(path);
+		CALC(path);
 	}
 })
 var WEB_01 = function () {
@@ -71,27 +79,25 @@ var WEB_04 = function (i, j) {
 	document.getElementById("div_search_result").style.display = "";
 
 	var num = document.getElementById("table_result").rows.length;
-	var Tr = document.getElementById("table_result").insertRow(num);
-	var Td;
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = (i + 1);
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = a_date[i];
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = a_time1[i];
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = a_time2[i];
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = calc_E(i);
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = calc_F(i);
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = calc_G(i);
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = calc_H(i);
-	Td = Tr.insertCell(-1);
-	Td.innerHTML = calc_I(i);
-	if (calc_H(i) > 0) {
+	var tr = document.getElementById("table_result").insertRow(num);
+	var td;
+	td = tr.insertCell(-1);
+	td.innerHTML = (i + 1);
+	td = tr.insertCell(-1);
+	td.innerHTML = a_date[i];
+	td = tr.insertCell(-1);
+	td.innerHTML = a_time1[i];
+	td = tr.insertCell(-1);
+	td.innerHTML = a_time2[i];
+	td = tr.insertCell(-1);
+	td.innerHTML = CALC_E(i);
+	td = tr.insertCell(-1);
+	td.innerHTML = CALC_F2(i);
+	td = tr.insertCell(-1);
+	td.innerHTML = CALC_H2(i);
+	td = tr.insertCell(-1);
+	td.innerHTML = CALC_I(i);
+	if (CALC_H2(i) > 0) {
 		document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'info';
 	}
 }
@@ -112,13 +118,6 @@ var WEB_06_RESET = function () {
 	document.getElementById("div_search_result").style.display = "none";
 	run_NM_1();
 }
-var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
-var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_datong = [], a_nanshan = [];
-var cheerio		= require("cheerio");
-var Nightmare	= require('nightmare');
-var nightmare	= Nightmare({ show: false, typeInterval: 20, switches: {
-		'ignore-certificate-errors': true
-	} });
 var run_NM_1 = function () {
 	nightmare
 	.goto('https://220.228.12.173/')
@@ -166,13 +165,13 @@ var run_NM_2 = function () {
 	nightmare
 	.goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
 	.wait('table.EmsFormTable')
-	.select("select[name='aid_start_year']", target_year1)
-	.select("select[name='aid_start_month']", target_month1)
-	.select("select[name='aid_start_day']", "01")
-	.select("select[name='aid_end_year']", target_year2)
-	.select("select[name='aid_end_month']", target_month2)
-	.select("select[name='aid_end_day']", "31")
-	.select('select[name="nurse_code"]', Nurse_Id)
+	.select("select[name='aid_start_year']",	target_year1)
+	.select("select[name='aid_start_month']",	target_month1)
+	.select("select[name='aid_start_day']",		"01")
+	.select("select[name='aid_end_year']",		target_year2)
+	.select("select[name='aid_end_month']",		target_month2)
+	.select("select[name='aid_end_day']",		"31")
+	.select('select[name="nurse_code"]',		Nurse_Id)
 	.click('input[type="submit"]')
 	.then(function (result) {
 		run_NM_2_1();
@@ -276,6 +275,7 @@ var run_NM_6 = function () { /******************* GO BACK **********************
 		if (table_cur == 12 && !(page_cur > page_length)) { //change page
 			run_NM_4();
 		} else if(table_cur == (table_length + 1) && page_cur == page_length) {
+			console.log('DONE!');
 			// run_NM_7();
 		} else {
 			run_NM_5();
@@ -286,7 +286,7 @@ var run_NM_6 = function () { /******************* GO BACK **********************
 	});
 }
 // var run_NM_7 = function () {
-	// calc();
+	// CALC();
 	// console.log('DONE! PLEEASE CHECK THE FILE');
 	// nightmare
 	// .end()
@@ -308,10 +308,10 @@ var target_dates = function () {
 	target_year2	= ('0' + target_year2).slice(-3);
 	run_NM_2();
 }
-var calc = function (path) {
-	var output_data = ['No.','Date','Out','In','Times','D.T.','N.S.','Overtime','If N.S.\r\n'].join('\t');
+var CALC = function (path) {
+	var output_data = ['No.','Date','Out','In','Times','Duration','Overtime','If N.S.\r\n'].join('\t');
 	for (var i = 0; i < a_date.length; i++) {
-		output_data = output_data + [(i + 1), a_date[i], a_time1[i], a_time2[i], calc_E(i), calc_F(i), calc_G(i), calc_H(i), calc_I(i)].join('\t') + "\r\n";
+		output_data = output_data + [(i + 1), a_date[i], a_time1[i], a_time2[i], CALC_E(i), CALC_F2(i), CALC_H2(i), CALC_I(i)].join('\t') + "\r\n";
 	}
 	var fs = require('fs');
 	fs.writeFile(path, output_data, function(error){ 
@@ -320,7 +320,7 @@ var calc = function (path) {
 		}
 	});
 }
-var calc_E = function (i) {
+var CALC_E = function (i) {
 	var e_time1 = new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
 	var e_time2 = new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
 	var e_time3 = new Date();
@@ -332,7 +332,7 @@ var calc_E = function (i) {
 		return e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
 	}
 }
-var calc_F = function (i) {
+var CALC_F2 = function (i) {
 	var e_time1		= new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
 	var e_time2		= new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
 	var e_time3		= new Date();
@@ -351,56 +351,41 @@ var calc_F = function (i) {
 			} else if (e_time1 < e_time08 && e_time2 >= e_time08) {
 				e_time3.setTime(e_time08 - e_time1);
 			}
-			a_datong[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
-			return a_datong[i];
+			a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+			return a_duration[i];
 		} else {
-			a_datong[i] = '';
-			return a_datong[i];
+			a_duration[i] = '';
+			return a_duration[i];
 		} 
 	} else {
-		a_datong[i] = '';
-		return a_datong[i];
-	} 
-}
-var calc_G = function (i) {
-	var e_time1		= new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
-	var e_time2		= new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
-	var e_time3		= new Date();
-	var e_time08	= new Date('1992/08/30 08:00:00').getTime();
-	if (a_car_no[i] == '215') {
 		if (e_time1 < e_time08 || e_time2 < e_time08) {
 			if (e_time1 > e_time08 && e_time2 <= e_time08) {
 				e_time3.setTime(e_time2);
-				a_nanshan[i] = e_time3.getHours() + ':' + e_time3.getMinutes();
+				a_duration[i] = e_time3.getHours() + ':' + e_time3.getMinutes();
 				return e_time3.getHours() + ':' + e_time3.getMinutes();
 			} else if (e_time1 < e_time08 && e_time2 <= e_time08) {
 				e_time3.setTime(e_time2 - e_time1);
-				a_nanshan[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+				a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
 				return e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
 			} else if (e_time1 < e_time08 && e_time2 > e_time08) {
 				e_time3.setTime(e_time08 - e_time1);
-				a_nanshan[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+				a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
 				return e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
 			}
 		}else {
-			a_nanshan[i] = '';
-			return a_nanshan[i];
+			a_duration[i] = '';
+			return a_duration[i];
 		}
-	} else {
-		a_nanshan[i] = '';
-		return a_nanshan[i];
-	}
+	} 
 }
-var calc_H = function (i) {
-	if (a_car_no[i] != '215' && a_datong[i] != '') {
-		return a_datong[i].split(':')[0];
-	} else if (a_car_no[i] == '215' && a_nanshan[i] != '') {
-		return a_nanshan[i].split(':')[0];
+var CALC_H2 = function (i) {
+	if (a_duration[i] != '') {
+		return a_duration[i].split(':')[0];
 	} else {
 		return '';
 	}
 }
-var calc_I = function (i) {
+var CALC_I = function (i) {
 	if (a_car_no[i] == '215') {
 		return 'V';
 	} else {
