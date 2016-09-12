@@ -34,3 +34,9 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+@media print {
+	#div_search_result_button {
+		display: none;
+	}
+}

@@ -63,7 +63,8 @@ saveBtn.addEventListener('click', function (event) {
 })
 ipc.on('saved-file', function (event, path) {
 	if (path) {
-		CALC(path);
+		// CALC(path);
+		ipc.send('print-to-pdf', path);
 	}
 })
 var WEB_01 = function () {
