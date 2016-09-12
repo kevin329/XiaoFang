@@ -8,16 +8,17 @@ const Nurse_IdIpt	= document.getElementById('Nurse_Id');
 const YearSlt		= document.getElementById('year');
 const MonthSlt		= document.getElementById('month');
 const LengthSlt		= document.getElementById('length');
+const Station_2Chk	= document.getElementById('Station_2');
+const Car_NoIpt		= document.getElementById('Car_No');
 const ipc			= require('electron').ipcRenderer;
-var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length;
+var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length, STATION_2_MODE = false, CAR_NO;
 var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
-var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [], a_datong = [], a_nanshan = [];
-var cheerio		= require("cheerio");
+var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [];
+var cheerio		= require('cheerio');
 var Nightmare	= require('nightmare');
 var nightmare	= Nightmare({ show: false, typeInterval: 20, switches: {
 		'ignore-certificate-errors': true
 	} });
-
 loginBtn.addEventListener('click', function (event) {
 	User_Id		= User_IdIpt.value;
 	User_PW		= User_PWIpt.value;
@@ -29,6 +30,9 @@ searchBtn.addEventListener('click', function (event) {
 	input_year		= YearSlt.value;
 	input_month		= MonthSlt.value;
 	input_length	= LengthSlt.value;
+	if (STATION_2_MODE) {
+		CAR_NO		= Car_NoIpt.value;
+	}
 	target_dates();
 	WEB_03();
 })
@@ -38,11 +42,24 @@ researchBtn.addEventListener('click', function (event) {
 	for (var i = 1; i < num; i++) {
 		document.getElementById("table_result").deleteRow(-1);
 	}
-	a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [], a_datong = [], a_nanshan = [];
+	a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [];
 	count_item = 1;
 })
+Station_2Chk.addEventListener('change', function(event) {
+	if (document.getElementById('Station_2').checked == true) {
+		document.getElementById('Car_No').disabled = false;
+		document.getElementById('Table_S2').style.display = '';
+		STATION_2_MODE	= true;
+		console.log('s2 mode ON');
+	} else {
+		document.getElementById('Car_No').disabled = true;
+		document.getElementById('Table_S2').style.display = 'none';
+		STATION_2_MODE = false;
+		console.log('s2 mode OFF');
+	}
+})
 saveBtn.addEventListener('click', function (event) {
-  ipc.send('save-dialog')
+	ipc.send('save-dialog')
 })
 ipc.on('saved-file', function (event, path) {
 	if (path) {
@@ -50,36 +67,36 @@ ipc.on('saved-file', function (event, path) {
 	}
 })
 var WEB_01 = function () {
-	document.getElementById("div_login").style.display = "none";
-	document.getElementById("div_login_text").style.display = "";
+	document.getElementById('div_login').style.display = 'none';
+	document.getElementById('div_login_text').style.display = '';
 }
 var WEB_02 = function (tf) {
 	if (tf) {
 		var cur_month = new Date();
 		cur_month = cur_month.getMonth();
 		cur_month++;
-		document.getElementById("div_login_text").style.display = "none";
-		document.getElementById("div_search").style.display = "";
-		document.getElementById("div_search_result").style.display = "none";
+		document.getElementById('div_login_text').style.display = 'none';
+		document.getElementById('div_search').style.display = '';
+		document.getElementById('div_search_result').style.display = 'none';
 		document.getElementById('Nurse_Id').focus();
-		document.querySelector('select#month option[value=\"' + cur_month + '\"]').selected = true;
+		document.querySelector('select#month option[value=\'' + cur_month + '\']').selected = true;
 	} else {
 		document.getElementById('msg').innerHTML = 'Login failed, please try again.';
-		document.getElementById("div_login_text").style.display = "none";
-		document.getElementById("div_login").style.display = "";
-		document.getElementById("div_msg").style.display = "";
+		document.getElementById('div_login_text').style.display = 'none';
+		document.getElementById('div_login').style.display = '';
+		document.getElementById('div_msg').style.display = '';
 	}
 }
 var WEB_03 = function () {
-	document.getElementById("div_search").style.display = "none";
-	document.getElementById("div_search_text").style.display = "";
+	document.getElementById('div_search').style.display = 'none';
+	document.getElementById('div_search_text').style.display = '';
 }
 var WEB_04 = function (i, j) {
-	document.getElementById("div_search_text").style.display = "none";
-	document.getElementById("div_search_result").style.display = "";
+	document.getElementById('div_search_text').style.display = 'none';
+	document.getElementById('div_search_result').style.display = '';
 
-	var num = document.getElementById("table_result").rows.length;
-	var tr = document.getElementById("table_result").insertRow(num);
+	var num	= document.getElementById('table_result').rows.length;
+	var tr	= document.getElementById('table_result').insertRow(num);
 	var td;
 	td = tr.insertCell(-1);
 	td.innerHTML = (i + 1);
@@ -95,27 +112,29 @@ var WEB_04 = function (i, j) {
 	td.innerHTML = CALC_F2(i);
 	td = tr.insertCell(-1);
 	td.innerHTML = CALC_H2(i);
-	td = tr.insertCell(-1);
-	td.innerHTML = CALC_I(i);
+	if (STATION_2_MODE) {
+		td = tr.insertCell(-1);
+		td.innerHTML = CALC_I(i);
+	}
 	if (CALC_H2(i) > 0) {
 		document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'info';
 	}
 }
 var WEB_05_NO_RESULT = function () {
-	document.getElementById("div_search_text").style.display = "none";
-	document.getElementById("div_search_result").style.display = "";
-	var tr = document.getElementById("table_result").insertRow(1);
+	document.getElementById('div_search_text').style.display = 'none';
+	document.getElementById('div_search_result').style.display = '';
+	var tr = document.getElementById('table_result').insertRow(1);
 	var td;
 	td = tr.insertCell(-1);
 	td.innerHTML = 'No case found.';
 	document.querySelector('tr:nth-child(2) td').colSpan = '9';
 }
 var WEB_06_RESET = function () {
-	document.getElementById("div_login").style.display = "";
-	document.getElementById("div_login_text").style.display = "none";
-	document.getElementById("div_search").style.display = "none";
-	document.getElementById("div_search_text").style.display = "none";
-	document.getElementById("div_search_result").style.display = "none";
+	document.getElementById('div_login').style.display = '';
+	document.getElementById('div_login_text').style.display = 'none';
+	document.getElementById('div_search').style.display = 'none';
+	document.getElementById('div_search_text').style.display = 'none';
+	document.getElementById('div_search_result').style.display = 'none';
 	run_NM_1();
 }
 var run_NM_1 = function () {
@@ -165,12 +184,12 @@ var run_NM_2 = function () {
 	nightmare
 	.goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
 	.wait('table.EmsFormTable')
-	.select("select[name='aid_start_year']",	target_year1)
-	.select("select[name='aid_start_month']",	target_month1)
-	.select("select[name='aid_start_day']",		"01")
-	.select("select[name='aid_end_year']",		target_year2)
-	.select("select[name='aid_end_month']",		target_month2)
-	.select("select[name='aid_end_day']",		"31")
+	.select('select[name="aid_start_year"]',	target_year1)
+	.select('select[name="aid_start_month"]',	target_month1)
+	.select('select[name="aid_start_day"]',		'01')
+	.select('select[name="aid_end_year"]',		target_year2)
+	.select('select[name="aid_end_month"]',		target_month2)
+	.select('select[name="aid_end_day"]',		'31')
 	.select('select[name="nurse_code"]',		Nurse_Id)
 	.click('input[type="submit"]')
 	.then(function (result) {
@@ -206,7 +225,7 @@ var run_NM_3 = function () { /******************* GET PAGE LENGTH **************
 	.then(function (result) {
 		page_length	= result;
 		page_cur	= 1;
-		console.log("page_length:\t" + page_length);
+		console.log('page_length:\t' + page_length);
 		run_NM_4();
 	})
 	.catch(function (error) {
@@ -338,26 +357,7 @@ var CALC_F2 = function (i) {
 	var e_time3		= new Date();
 	var e_time08	= new Date('1992/08/30 08:00:00').getTime();
 	var e_time18	= new Date('1992/08/30 18:00:00').getTime();
-	if (a_car_no[i] != '215') {
-		if (e_time1 < e_time08 || e_time1 > e_time18 || e_time2 < e_time08 || e_time2 > e_time18) {
-			if (e_time1 < e_time18 && e_time2 > e_time18) {
-				e_time3.setTime(e_time2 - e_time18);
-			} else if (e_time1 >= e_time18 && e_time2 > e_time18) {
-				e_time3.setTime(e_time2 - e_time1);
-			} else if (e_time1 > e_time18 && e_time2 < e_time08) {
-				e_time3.setTime(e_time2 - e_time1 + 86400000);
-			} else if (e_time1 < e_time08 && e_time2 < e_time08) {
-				e_time3.setTime(e_time2 - e_time1);
-			} else if (e_time1 < e_time08 && e_time2 >= e_time08) {
-				e_time3.setTime(e_time08 - e_time1);
-			}
-			a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
-			return a_duration[i];
-		} else {
-			a_duration[i] = '';
-			return a_duration[i];
-		} 
-	} else {
+	if (STATION_2_MODE == true && a_car_no[i] == CAR_NO) {
 		if (e_time1 < e_time08 || e_time2 < e_time08) {
 			if (e_time1 > e_time08 && e_time2 <= e_time08) {
 				e_time3.setTime(e_time2);
@@ -376,7 +376,26 @@ var CALC_F2 = function (i) {
 			a_duration[i] = '';
 			return a_duration[i];
 		}
-	} 
+	} else {
+		if (e_time1 < e_time08 || e_time1 > e_time18 || e_time2 < e_time08 || e_time2 > e_time18) {
+			if (e_time1 < e_time18 && e_time2 > e_time18) {
+				e_time3.setTime(e_time2 - e_time18);
+			} else if (e_time1 >= e_time18 && e_time2 > e_time18) {
+				e_time3.setTime(e_time2 - e_time1);
+			} else if (e_time1 > e_time18 && e_time2 < e_time08) {
+				e_time3.setTime(e_time2 - e_time1 + 86400000);
+			} else if (e_time1 < e_time08 && e_time2 < e_time08) {
+				e_time3.setTime(e_time2 - e_time1);
+			} else if (e_time1 < e_time08 && e_time2 >= e_time08) {
+				e_time3.setTime(e_time08 - e_time1);
+			}
+			a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+			return a_duration[i];
+		} else {
+			a_duration[i] = '';
+			return a_duration[i];
+		} 
+	}
 }
 var CALC_H2 = function (i) {
 	if (a_duration[i] != '') {
@@ -386,7 +405,7 @@ var CALC_H2 = function (i) {
 	}
 }
 var CALC_I = function (i) {
-	if (a_car_no[i] == '215') {
+	if (a_car_no[i] == CAR_NO) {
 		return 'V';
 	} else {
 		return '';

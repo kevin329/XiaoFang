@@ -67,6 +67,21 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="col-sm-offset-3 col-sm-9">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="Station_2"> Station 2 Mode
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label" for="Car_No">Car No.</label>
+				<div class="col-sm-9">
+					<input type="number" id="Car_No" class="form-control" placeholder="Car No." disabled>
+				</div>
+			</div>
+			<div class="form-group">
 				<div class="col-sm-12">
 					<br>
 					<button type="button" id="search" class="btn btn-lg btn-primary btn-block">Search</button>
@@ -84,7 +99,7 @@
 	<div id="div_search_result" class="container" style="display:none">
 		<h2>Result</h2>
 		<table id="table_result" class="table">
-			<tr><th>NO.</th><th>DATE</th><th>OUT</th><th>IN</th><th>TIME</th><th>Duration</th><th>OVERTIME</th><th>Station 2</th></tr>
+			<tr><th>NO.</th><th>DATE</th><th>OUT</th><th>IN</th><th>TIME</th><th>Duration</th><th>OVERTIME</th><th id="Table_S2" style="display:none">Station 2</th></tr>
 		</table>
 		<button type="button" id="search_again" class="btn btn-default">Search again</button>
 		<button type="button" id="save_button" class="btn btn-primary">Save</button>
@@ -98,6 +113,14 @@
 		event.preventDefault();
 		if (event.keyCode == 13) {
 			document.getElementById("login").click();
+		}
+	});
+	document.getElementById("Station_2")
+	.addEventListener("change", function(event) {
+		if (document.getElementById("Station_2").checked == true) {
+			document.getElementById("Car_No").disabled = false;
+		} else {
+			document.getElementById("Car_No").disabled = true;
 		}
 	});
 </script>
