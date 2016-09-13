@@ -33,7 +33,6 @@ searchBtn.addEventListener('click', function (event) {
     if (STATION_2_MODE) {
         CAR_NO      = Car_NoIpt.value.substr(7);
     }
-    console.log(CAR_NO);
     target_dates();
     WEB_03();
 })
@@ -205,8 +204,8 @@ var run_NM_1_4 = function () {
 }
 var run_NM_2 = function () {
     nightmare
-    // .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
-    // .wait('table.EmsFormTable')
+    .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
+    .wait('table.EmsFormTable')
     .select('select[name="aid_start_year"]',    target_year1)
     .select('select[name="aid_start_month"]',   target_month1)
     .select('select[name="aid_start_day"]',     '01')
