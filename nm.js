@@ -11,25 +11,25 @@ const LengthSlt     = document.getElementById('length');
 const Station_2Chk  = document.getElementById('Station_2');
 const Car_NoIpt     = document.getElementById('Car_No');
 const ipc           = require('electron').ipcRenderer;
-var User_Id, User_PW, Nurse_Id, input_year, input_month, input_length, STATION_2_MODE = false, CAR_NO;
-var cookie, count_item = 1, target_year1, target_year2, target_month1, target_month2, table_length, table_cur, page_length, page_cur, page_next_start;
-var a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [];
+var USER_ID, USER_PW, NURSE_ID, INPUT_YEAR, INPUT_MONTH, INPUT_LENGTH, STATION_2_MODE = false, CAR_NO, NURSE_NAME;
+var cookie, COUNT_ITEM = 1, TARGET_YEAR1, TARGET_YEAR2, TARGET_MONTH1, TARGET_MONTH2, TABLE_LENGTH, TABLE_CUR, PAGE_LENGTH, PAGE_CUR, PAGE_NEXT_START;
+var A_DATE = [], A_TIME1 = [], A_TIME2 = [], A_CAR_NO = [], A_OVERTIME = [], A_PARTNER = [];
 var cheerio     = require('cheerio');
 var Nightmare   = require('nightmare');
 var nightmare   = Nightmare({ show: false, typeInterval: 20, switches: {
         'ignore-certificate-errors': true
     } });
 loginBtn.addEventListener('click', function (event) {
-    User_Id     = User_IdIpt.value;
-    User_PW     = User_PWIpt.value;
+    USER_ID     = User_IdIpt.value;
+    USER_PW     = User_PWIpt.value;
     WEB_01();
     run_NM_1();
 })
 searchBtn.addEventListener('click', function (event) {
-    Nurse_Id        = Nurse_IdSlt.value;
-    input_year      = YearSlt.value;
-    input_month     = MonthSlt.value;
-    input_length    = LengthSlt.value;
+    NURSE_ID        = Nurse_IdSlt.value;
+    INPUT_YEAR      = YearSlt.value;
+    INPUT_MONTH     = MonthSlt.value;
+    INPUT_LENGTH    = LengthSlt.value;
     if (STATION_2_MODE) {
         CAR_NO      = Car_NoIpt.value.substr(7);
     }
@@ -42,8 +42,8 @@ researchBtn.addEventListener('click', function (event) {
     for (var i = 1; i < num; i++) {
         document.getElementById("table_result").deleteRow(-1);
     }
-    a_date = [], a_time1 = [], a_time2 = [], a_car_no = [], a_duration = [];
-    count_item = 1;
+    A_DATE = [], A_TIME1 = [], A_TIME2 = [], A_CAR_NO = [], A_OVERTIME = [], A_PARTNER = [];
+    COUNT_ITEM = 1;
 })
 Station_2Chk.addEventListener('change', function(event) {
     if (document.getElementById('Station_2').checked == true) {
@@ -94,23 +94,24 @@ var WEB_04 = function (i, j) {
     td = tr.insertCell(-1);
     td.innerHTML = (i + 1);
     td = tr.insertCell(-1);
-    td.innerHTML = a_date[i];
+    td.innerHTML = A_DATE[i];
     td = tr.insertCell(-1);
-    td.innerHTML = a_time1[i];
+    td.innerHTML = A_TIME1[i];
     td = tr.insertCell(-1);
-    td.innerHTML = a_time2[i];
+    td.innerHTML = A_TIME2[i];
     td = tr.insertCell(-1);
     td.innerHTML = CALC_E(i);
     td = tr.insertCell(-1);
     td.innerHTML = CALC_F2(i);
     td = tr.insertCell(-1);
     td.innerHTML = CALC_H2(i);
+    td = tr.insertCell(-1);
+    td.innerHTML = A_PARTNER[i];
     if (STATION_2_MODE) {
         td = tr.insertCell(-1);
         td.innerHTML = CALC_I(i);
     }
     if (CALC_H2(i) > 0) {
-        // document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'accent';
         document.querySelector('tr:nth-child(' + (num+1) + ')').style.backgroundColor = '#3393df';
     }
 }
@@ -150,8 +151,8 @@ var run_NM_1 = function () {
 var run_NM_1_2 = function () {
     nightmare
     .wait('#User_Id')
-    .type('input[name=User_Id]', User_Id)
-    .type('input[name=User_PW]', User_PW)
+    .type('input[name=User_Id]', USER_ID)
+    .type('input[name=User_PW]', USER_PW)
     .type('input[name=txtChkCode]', '')
     .type('input[name=txtChkCode]', cookie)
     .click('input[name=btn_LogOk]')
@@ -186,10 +187,9 @@ var run_NM_1_4 = function () {
     })
     .then(function (result) {
         var $       = cheerio.load(result);
-        var temp    = $('select[name=dept_no1] option').text();
+        var temp    = $('select[name=dept_no1] option').text();//
         var nurse_code   = $('select[name=nurse_code]').html();
         var car_no2   = $('select[name=ambu_no]').html();
-        var temp3   = $('select[name=nurse_code] option[value=\"' + Nurse_Id + '\"]').text();
         // console.log('temp:\t' + temp + temp3);
         document.getElementById('Nurse_Id').innerHTML = nurse_code;
         document.getElementById('Car_No').innerHTML = car_no2;
@@ -207,15 +207,21 @@ var run_NM_2 = function () {
     nightmare
     .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMT.jsp?start=1')
     .wait('table.EmsFormTable')
-    .select('select[name="aid_start_year"]',    target_year1)
-    .select('select[name="aid_start_month"]',   target_month1)
+    .select('select[name="aid_start_year"]',    TARGET_YEAR1)
+    .select('select[name="aid_start_month"]',   TARGET_MONTH1)
     .select('select[name="aid_start_day"]',     '01')
-    .select('select[name="aid_end_year"]',      target_year2)
-    .select('select[name="aid_end_month"]',     target_month2)
+    .select('select[name="aid_end_year"]',      TARGET_YEAR2)
+    .select('select[name="aid_end_month"]',     TARGET_MONTH2)
     .select('select[name="aid_end_day"]',       '31')
-    .select('select[name="nurse_code"]',        Nurse_Id)
+    .select('select[name="nurse_code"]',        NURSE_ID)
     .click('input[type="submit"]')
+    .evaluate(function () {
+        return document.querySelector('html').innerHTML;
+    })
     .then(function (result) {
+        var $       = cheerio.load(result);
+        NURSE_NAME  = $('select[name=nurse_code] option[value=\"' + NURSE_ID + '\"]').text();//name
+        console.log(NURSE_NAME);
         run_NM_2_1();
     })
     .catch(function (error) {
@@ -246,9 +252,9 @@ var run_NM_3 = function () { /******************* GET PAGE LENGTH **************
         return document.querySelector('select[name=select1]').getElementsByTagName('option').length;
     })
     .then(function (result) {
-        page_length = result;
-        page_cur    = 1;
-        console.log('page_length:\t' + page_length);
+        PAGE_LENGTH = result;
+        PAGE_CUR    = 1;
+        console.log('PAGE_LENGTH:\t' + PAGE_LENGTH);
         run_NM_4();
     })
     .catch(function (error) {
@@ -262,9 +268,9 @@ var run_NM_4 = function () { /******************* GET TABLE LENGTH *************
         return document.querySelector('table.EmsDataTable').getElementsByTagName('tr').length;
     })
     .then(function (result) {
-        table_length    = result;
-        table_cur       = 2;
-        console.log('table_length:\t' + table_length);
+        TABLE_LENGTH    = result;
+        TABLE_CUR       = 2;
+        console.log('TABLE_LENGTH:\t' + TABLE_LENGTH);
         run_NM_5();
     })
     .catch(function (error) {
@@ -272,10 +278,10 @@ var run_NM_4 = function () { /******************* GET TABLE LENGTH *************
     });
 }
 var run_NM_5 = function () {
-    if (table_cur < table_length + 1) {
-        console.log('table_cur\t' + table_cur);
+    if (TABLE_CUR < TABLE_LENGTH + 1) {
+        console.log('TABLE_CUR\t' + TABLE_CUR);
         nightmare
-        .click('form[name=form1] table tr:nth-child(' + table_cur + ') input[name=code_id]')
+        .click('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') input[name=code_id]')
         .click('form[name=form1] input[type=button][value="明細"]')
         .wait('table.EmsDataTable1')
         .evaluate(function () {
@@ -287,23 +293,31 @@ var run_NM_5 = function () {
             var time1   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(4) td:nth-child(2) font').text();
             var time2   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(5) td:nth-child(6) font').text();
             var car_no  = $('form[name=form1] > table.EmsDataTable1 tr:nth-child(1) td:nth-child(2) font').text();
+            var partner = $('table.EmsDataTable1:nth-child(3) tr:nth-child(3) td:nth-child(2) font').text();
             time1       = time1.split(':')[0].substr(time1.split(':')[0].length - 2) + ':' + time1.split(':')[1].substr(0 ,2);
             time2       = time2.split(':')[0].substr(time2.split(':')[0].length - 2) + ':' + time2.split(':')[1].substr(0 ,2);
             car_no      = car_no.substr(0 ,3);
-            a_date[count_item - 1]      = date;
-            a_time1[count_item - 1]     = time1;
-            a_time2[count_item - 1]     = time2;
-            a_car_no[count_item - 1]    = car_no;
-            console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no);
-
-            WEB_04(count_item - 1, page_cur);
+            A_DATE[COUNT_ITEM - 1]      = date;
+            A_TIME1[COUNT_ITEM - 1]     = time1;
+            A_TIME2[COUNT_ITEM - 1]     = time2;
+            A_CAR_NO[COUNT_ITEM - 1]    = car_no;
             
-            count_item++;
-            table_cur++;
-            if (table_cur == 12) {
-                page_cur++;
+            if (NURSE_NAME != '%') {
+                partner = partner.replace(NURSE_NAME, '');
             }
-            page_next_start = ((page_cur - 1) * 10) + 1;
+            partner = partner.replace(/\s\s+/g, ' ');
+            A_PARTNER[COUNT_ITEM - 1]   = partner;
+
+            console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no + '\n' + partner);
+
+            WEB_04(COUNT_ITEM - 1, PAGE_CUR);
+            
+            COUNT_ITEM++;
+            TABLE_CUR++;
+            if (TABLE_CUR == 12 && PAGE_CUR != PAGE_LENGTH) {
+                PAGE_CUR++;
+            }
+            PAGE_NEXT_START = ((PAGE_CUR - 1) * 10) + 1;
             run_NM_6();
         })
         .catch(function (error) {
@@ -313,11 +327,11 @@ var run_NM_5 = function () {
 }
 var run_NM_6 = function () { /******************* GO BACK ***************************/
     nightmare
-    .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMTSelect.jsp?start=' + page_next_start)
+    .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMTSelect.jsp?start=' + PAGE_NEXT_START)
     .then(function () {
-        if (table_cur == 12 && !(page_cur > page_length)) { //change page
+        if (TABLE_CUR == 12 && !(PAGE_CUR > PAGE_LENGTH)) { //change page
             run_NM_4();
-        } else if(table_cur == (table_length + 1) && page_cur == page_length) {
+        } else if(TABLE_CUR == (TABLE_LENGTH + 1) && PAGE_CUR == PAGE_LENGTH) {
             console.log('DONE!');
             // run_NM_7();
         } else {
@@ -337,24 +351,24 @@ var run_NM_6 = function () { /******************* GO BACK **********************
     // });
 // }
 var target_dates = function () {
-    target_month1   = input_month;
-    target_year1    = input_year;
-    target_month2   = parseInt(input_month) + parseInt(input_length) - 1;
-    target_year2    = target_year1;
-    if (target_month2 > 12) {
-        target_month2   -= 12;
-        target_year2    += 1;
+    TARGET_MONTH1   = INPUT_MONTH;
+    TARGET_YEAR1    = INPUT_YEAR;
+    TARGET_MONTH2   = parseInt(INPUT_MONTH) + parseInt(INPUT_LENGTH) - 1;
+    TARGET_YEAR2    = TARGET_YEAR1;
+    if (TARGET_MONTH2 > 12) {
+        TARGET_MONTH2   -= 12;
+        TARGET_YEAR2    += 1;
     }
-    target_month1   = ('0' + target_month1).slice(-2);
-    target_month2   = ('0' + target_month2).slice(-2);
-    target_year1    = ('0' + target_year1).slice(-3);
-    target_year2    = ('0' + target_year2).slice(-3);
+    TARGET_MONTH1   = ('0' + TARGET_MONTH1).slice(-2);
+    TARGET_MONTH2   = ('0' + TARGET_MONTH2).slice(-2);
+    TARGET_YEAR1    = ('0' + TARGET_YEAR1).slice(-3);
+    TARGET_YEAR2    = ('0' + TARGET_YEAR2).slice(-3);
     run_NM_2();
     // run_NM_1_4();
 }
 var CALC_E = function (i) {
-    var e_time1 = new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
-    var e_time2 = new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
+    var e_time1 = new Date('1992/08/30 ' + A_TIME1[i] + ':00').getTime();
+    var e_time2 = new Date('1992/08/30 ' + A_TIME2[i] + ':00').getTime();
     var e_time3 = new Date();
     if (e_time2 > e_time1) {
         e_time3.setTime(e_time2 - e_time1);
@@ -365,25 +379,25 @@ var CALC_E = function (i) {
     }
 }
 var CALC_F2 = function (i) {
-    var e_time1     = new Date('1992/08/30 ' + a_time1[i] + ':00').getTime();
-    var e_time2     = new Date('1992/08/30 ' + a_time2[i] + ':00').getTime();
+    var e_time1     = new Date('1992/08/30 ' + A_TIME1[i] + ':00').getTime();
+    var e_time2     = new Date('1992/08/30 ' + A_TIME2[i] + ':00').getTime();
     var e_time3     = new Date();
     var e_time08    = new Date('1992/08/30 08:00:00').getTime();
     var e_time18    = new Date('1992/08/30 18:00:00').getTime();
-    if (STATION_2_MODE == true && a_car_no[i] == CAR_NO) {
+    if (STATION_2_MODE == true && A_CAR_NO[i] == CAR_NO) {
         if (e_time1 < e_time08 || e_time2 < e_time08) {
             if (e_time1 > e_time08 && e_time2 <= e_time08) {
                 e_time3.setTime(e_time2);
-                a_duration[i] = e_time3.getHours() + ':' + e_time3.getMinutes();
+                A_OVERTIME[i] = e_time3.getHours() + ':' + e_time3.getMinutes();
             } else if (e_time1 < e_time08 && e_time2 <= e_time08) {
                 e_time3.setTime(e_time2 - e_time1);
-                a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+                A_OVERTIME[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
             } else if (e_time1 < e_time08 && e_time2 > e_time08) {
                 e_time3.setTime(e_time08 - e_time1);
-                a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+                A_OVERTIME[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
             }
         }else {
-            a_duration[i] = '';
+            A_OVERTIME[i] = '';
         }
     } else {
         if (e_time1 < e_time08 || e_time1 > e_time18 || e_time2 < e_time08 || e_time2 > e_time18) {
@@ -398,25 +412,25 @@ var CALC_F2 = function (i) {
             } else if (e_time1 < e_time08 && e_time2 >= e_time08) {
                 e_time3.setTime(e_time08 - e_time1);
             }
-            a_duration[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
+            A_OVERTIME[i] = e_time3.getUTCHours() + ':' + e_time3.getUTCMinutes();
         } else {
-            a_duration[i] = '';
+            A_OVERTIME[i] = '';
         }
     }
-    if (a_duration[i] != '') {
-        a_duration[i] = a_duration[i].split(':')[0] + ':' + (0 + a_duration[i].split(':')[1]).slice(-2);
+    if (A_OVERTIME[i] != '') {
+        A_OVERTIME[i] = A_OVERTIME[i].split(':')[0] + ':' + (0 + A_OVERTIME[i].split(':')[1]).slice(-2);
     }
-    return a_duration[i];
+    return A_OVERTIME[i];
 }
 var CALC_H2 = function (i) {
-    if (a_duration[i] != '') {
-        return a_duration[i].split(':')[0];
+    if (A_OVERTIME[i] != '') {
+        return A_OVERTIME[i].split(':')[0];
     } else {
         return '';
     }
 }
 var CALC_I = function (i) {
-    if (a_car_no[i] == CAR_NO) {
+    if (A_CAR_NO[i] == CAR_NO) {
         return 'V';
     } else {
         return '';
