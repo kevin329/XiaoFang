@@ -110,7 +110,8 @@ var WEB_04 = function (i, j) {
         td.innerHTML = CALC_I(i);
     }
     if (CALC_H2(i) > 0) {
-        document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'info';
+        // document.querySelector('tr:nth-child(' + (num+1) + ')').className += 'accent';
+        document.querySelector('tr:nth-child(' + (num+1) + ')').style.backgroundColor = '#3393df';
     }
 }
 var WEB_05_NO_RESULT = function () {

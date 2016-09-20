@@ -1,146 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="UTF-8">
-	<title>Fang</title>
-	<link rel="stylesheet" href="./index.css">
-	<link rel="stylesheet" href="./bootstrap/css/winstrap.min.css">
+    <meta charset="UTF-8">
+    <title>Fang</title>
+    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./bootstrap/css/winstrap.min.css" />
+    <link rel="stylesheet" href="winjs/css/ui-light.min.css" media="screen" />
+    <link rel="stylesheet" href="menu.css" />
+    <script src="winjs/js/base.min.js"></script>
+    <script src="winjs/js/ui.min.js"></script>
+    <script src="menu.js"></script>
 </head>
 <body id="body">
-	<div id="div_login" class="container">
-		<form class="form-signin" style="max-width: 330px; padding: 15px; margin: 0 auto;">
-			<h2 class="form-signin-heading">Please sign in</h2>
-			<input type="text" id="User_Id" class="form-control" placeholder="Username" autofocus>
-			<input type="password" id="User_PW" class="form-control" placeholder="Password">
-			<button type="button" id="login" class="btn btn-lg btn-primary btn-block">Login</button><br>
-			<div id="div_msg" class="alert alert-danger" role="alert" style="display:none">
-				<p id="msg"></p>
-			</div>
-		</form>
-	</div>
-	<div id="div_search" class="container" style="display:none">
-		<form class="form-horizontal" style="max-width: 500px; padding: 15px; margin: 0 auto;">
-			<div class="form-group">
-				<label class="col-sm-6" for="Nurse_Id">Nurse ID</label>
-				<div class="col-sm-18">
-					<div class="combobox">
-						<select class="form-control" id="Nurse_Id">
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-6" for="year">Year</label>
-				<div class="col-sm-18">
-					<div class="combobox">
-						<select class="form-control" id="year">
-							<option value="105">105</option>
-							<option value="106">106</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-6" for="month">Month</label>
-				<div class="col-sm-18">
-					<div class="combobox">
-						<select class="form-control" id="month">
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-							<option value="9">9</option>
-							<option value="10">10</option>
-							<option value="11">11</option>
-							<option value="12">12</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-6" for="length">Length</label>
-				<div class="col-sm-18">
-	                <div class="combobox">
-		                <select class="form-control" id="length">
-		                    <option>1</option>
-		                    <option>2</option>
-		                    <option>3</option>
-		                    <option>4</option>
-		                </select>
-		            </div>
-	            </div>
-	        </div>
-			<div class="form-group">
-				<div class="col-sm-offset-6 col-sm-18">
-					<div class="checkbox">
-		                <label>
-		                    <input type="checkbox" id="Station_2"></input>
-		                    <span>Station 2 Mode</span>
-		                </label>
-		            </div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-6" for="Car_No">Car No.</label>
-				<div class="col-sm-18">
-					<div class="combobox">
-						<select class="form-control" id="Car_No" disabled>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-24">
-					<br>
-					<button type="button" id="search" class="btn btn-lg btn-primary btn-block">Search</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<div id="div_login_text" class="container" style="display:none">
-		<div class="progress-ring progress-large center">
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<p class="color-type-accent" style="padding-top: 80px;">Login…</p>
-		</div>
-	</div>
-	<div id="div_search_text" class="container" style="display:none">
-		<div class="progress-ring progress-large center">
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<div class="progress-circle"></div>
-			<p class="color-type-accent" style="padding-top: 80px;">Searching…</p>
-		</div>
-	</div>
-	</div>
-	<div id="div_search_result" class="container" style="max-width: 900px; display:none">
-		<h2>Result</h2>
-		<table id="table_result" class="table">
-			<tr><th>NO.</th><th>DATE</th><th>OUT</th><th>IN</th><th>Duration</th><th>OVERTIME</th><th>TIME</th><th id="Table_S2" style="display:none">Station 2</th></tr>
-		</table>
-		<div id="div_search_result_button">
-			<button type="button" id="search_again" class="btn btn-default">Search again</button>
-			<button type="button" id="save_button" class="btn btn-primary">Save to PDF</button>
-		</div>
-	</div>
+<div id="app" class="show-home">
+    <div id="splitview" class="splitView" data-win-control="WinJS.UI.SplitView" data-win-options="{
+            openedDisplayMode: 'overlay',
+            closedDisplayMode: 'none'
+         }">
+        <!-- Pane area -->
+        <div id="pane">
+            <div class="header">
+                <button
+                    class="win-splitviewpanetoggle"
+                    data-win-control="WinJS.UI.SplitViewPaneToggle"
+                    data-win-options="{ splitView: select('.splitView') }"
+                ></button>
+                <div class="title">Fang Setting</div>
+            </div>
+
+            <div class="nav-commands">
+                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home',
+                        oninvoked: mySplitView.homeClicked}"></div>
+                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'About', icon: 'mappin', oninvoked: mySplitView.trailClicked}"></div>
+                
+            </div>
+        </div>
+
+        <!-- Content area -->
+        <button
+                    class="win-splitviewpanetoggle"
+                    data-win-control="WinJS.UI.SplitViewPaneToggle"
+                    data-win-options="{ splitView: select('.splitView') }"
+                ></button>
+        <div class="trail-ui"> 
+            <!-- TRAIL DESCRIPTION -->
+            <div class="description"> 
+                <!-- this is where the title, location and description are injected for each hiking page -->
+                <h2 class="trail-title">About</h2>
+                <p class="trail-description">
+                    Fang<br />
+                    Version 0.1 beta<br />
+                    Author K.U.K., Paul Li<br />
+
+                </p>
+            </div>
+        </div>  <!-- closes trail-ui-->
+        <div class="home-ui">
+            <div id="div_login" class="container">
+                <form class="form-signin" style="max-width: 330px; padding: 15px; margin: 0 auto;">
+                    <h2 class="form-signin-heading">Please sign in</h2>
+                    <input type="text" id="User_Id" class="form-control" placeholder="Username" autofocus>
+                    <input type="password" id="User_PW" class="form-control" placeholder="Password">
+                    <button type="button" id="login" class="btn btn-lg btn-primary btn-block">Login</button><br>
+                    <div id="div_msg" class="alert alert-danger" role="alert" style="display:none">
+                        <p id="msg"></p>
+                    </div>
+                </form>
+            </div>
+            <div id="div_search" class="container" style="display:none">
+                <form class="form-horizontal" style="max-width: 500px; padding: 15px; margin: 0 auto;">
+                    <div class="form-group">
+                        <label class="col-sm-6" for="Nurse_Id">Nurse ID</label>
+                        <div class="col-sm-18">
+                            <div class="combobox">
+                                <select class="form-control" id="Nurse_Id">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-6" for="year">Year</label>
+                        <div class="col-sm-18">
+                            <div class="combobox">
+                                <select class="form-control" id="year">
+                                    <option value="105">105</option>
+                                    <option value="106">106</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-6" for="month">Month</label>
+                        <div class="col-sm-18">
+                            <div class="combobox">
+                                <select class="form-control" id="month">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-6" for="length">Length</label>
+                        <div class="col-sm-18">
+                            <div class="combobox">
+                                <select class="form-control" id="length">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-6 col-sm-18">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="Station_2"></input>
+                                    <span>Station 2 Mode</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-6" for="Car_No">Car No.</label>
+                        <div class="col-sm-18">
+                            <div class="combobox">
+                                <select class="form-control" id="Car_No" disabled>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-24">
+                            <br>
+                            <button type="button" id="search" class="btn btn-lg btn-primary btn-block">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="div_login_text" class="container" style="display:none">
+                <div id="ring" class="progress-ring progress-large center">
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <p class="color-type-accent" style="padding-top: 80px;">Login…</p>
+                </div>
+            </div>
+            <div id="div_search_text" class="container" style="display:none">
+                <div class="progress-ring progress-large center">
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <div class="progress-circle"></div>
+                    <p class="color-type-accent" style="padding-top: 80px;">Searching…</p>
+                </div>
+            </div>
+            <div id="div_search_result" class="container" style="max-width: 900px; display:none">
+                <h2>Result</h2>
+                <table id="table_result" class="table">
+                    <tr><th>NO.</th><th>DATE</th><th>OUT</th><th>IN</th><th>Duration</th><th>OVERTIME</th><th>TIME</th><th id="Table_S2" style="display:none">Station 2</th></tr>
+                </table>
+                <div id="div_search_result_button">
+                    <button type="button" id="search_again" class="btn btn-default">Search again</button>
+                    <button type="button" id="save_button" class="btn btn-primary">Save to PDF</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+
+
+
 </body>
 </html>
 <script src="./nm.js"></script>
 <script>
-	document.getElementById("User_PW")
-	.addEventListener("keyup", function(event) {
-		event.preventDefault();
-		if (event.keyCode == 13) {
-			document.getElementById("login").click();
-		}
-	});
+    document.getElementById("User_PW")
+    .addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode == 13) {
+            document.getElementById("login").click();
+        }
+    });
 </script>
