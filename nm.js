@@ -8,8 +8,9 @@ const Nurse_IdSlt   = document.getElementById('Nurse_Id');
 const YearSlt       = document.getElementById('year');
 const MonthSlt      = document.getElementById('month');
 const LengthSlt     = document.getElementById('length');
-const Station_2Chk  = document.getElementById('Station_2');
+// const Station_2Chk  = document.getElementById('Station_2');
 const Car_NoIpt     = document.getElementById('Car_No');
+const S2_MODE       = document.getElementById('s2_mode');
 const ipc           = require('electron').ipcRenderer;
 var USER_ID, USER_PW, NURSE_ID, INPUT_YEAR, INPUT_MONTH, INPUT_LENGTH, STATION_2_MODE = false, CAR_NO, NURSE_NAME;
 var cookie, COUNT_ITEM = 1, TARGET_YEAR1, TARGET_YEAR2, TARGET_MONTH1, TARGET_MONTH2, TABLE_LENGTH, TABLE_CUR, PAGE_LENGTH, PAGE_CUR, PAGE_NEXT_START;
@@ -45,8 +46,22 @@ researchBtn.addEventListener('click', function (event) {
     A_DATE = [], A_TIME1 = [], A_TIME2 = [], A_CAR_NO = [], A_OVERTIME = [], A_PARTNER = [];
     COUNT_ITEM = 1;
 })
-Station_2Chk.addEventListener('change', function(event) {
-    if (document.getElementById('Station_2').checked == true) {
+// Station_2Chk.addEventListener('change', function(event) {
+//     if (document.getElementById('Station_2').checked == true) {
+//         document.getElementById('Car_No').disabled = false;
+//         document.getElementById('Table_S2').style.display = '';
+//         STATION_2_MODE  = true;
+//         console.log('s2 mode ON');
+//     } else {
+//         document.getElementById('Car_No').disabled = true;
+//         document.getElementById('Table_S2').style.display = 'none';
+//         STATION_2_MODE = false;
+//         console.log('s2 mode OFF');
+//     }
+// })
+S2_MODE.addEventListener('click', function (event) {
+    document.getElementById("s2_mode").classList.toggle("active");
+    if (S2_MODE.classList.contains('active')) {
         document.getElementById('Car_No').disabled = false;
         document.getElementById('Table_S2').style.display = '';
         STATION_2_MODE  = true;
@@ -54,7 +69,7 @@ Station_2Chk.addEventListener('change', function(event) {
     } else {
         document.getElementById('Car_No').disabled = true;
         document.getElementById('Table_S2').style.display = 'none';
-        STATION_2_MODE = false;
+        STATION_2_MODE  = false;
         console.log('s2 mode OFF');
     }
 })
