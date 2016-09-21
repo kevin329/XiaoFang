@@ -13,7 +13,7 @@ const Car_NoIpt     = document.getElementById('Car_No');
 const S2_MODE       = document.getElementById('s2_mode');
 const ipc           = require('electron').ipcRenderer;
 var USER_ID, USER_PW, NURSE_ID, INPUT_YEAR, INPUT_MONTH, INPUT_LENGTH, STATION_2_MODE = false, CAR_NO, NURSE_NAME;
-var cookie, COUNT_ITEM = 1, TARGET_YEAR1, TARGET_YEAR2, TARGET_MONTH1, TARGET_MONTH2, TABLE_LENGTH, TABLE_CUR, PAGE_LENGTH, PAGE_CUR, PAGE_NEXT_START;
+var COOKIE, COUNT_ITEM = 1, TARGET_YEAR1, TARGET_YEAR2, TARGET_MONTH1, TARGET_MONTH2, TABLE_LENGTH, TABLE_CUR, PAGE_LENGTH, PAGE_CUR, PAGE_NEXT_START;
 var A_DATE = [], A_TIME1 = [], A_TIME2 = [], A_CAR_NO = [], A_OVERTIME = [], A_PARTNER = [];
 var cheerio     = require('cheerio');
 var Nightmare   = require('nightmare');
@@ -155,7 +155,7 @@ var run_NM_1 = function () {
     .goto('https://220.228.12.173/')
     .cookies.get()
     .then(function (cookies) {
-        cookie = cookies[1]['value'];
+        COOKIE = cookies[1]['value'];
         run_NM_1_2();
     })
     .catch(function (error) {
@@ -169,7 +169,7 @@ var run_NM_1_2 = function () {
     .type('input[name=User_Id]', USER_ID)
     .type('input[name=User_PW]', USER_PW)
     .type('input[name=txtChkCode]', '')
-    .type('input[name=txtChkCode]', cookie)
+    .type('input[name=txtChkCode]', COOKIE)
     .click('input[name=btn_LogOk]')
     .wait(2000)
     .then(function () {
@@ -293,64 +293,91 @@ var run_NM_4 = function () { /******************* GET TABLE LENGTH *************
     });
 }
 var run_NM_5 = function () {
-    if (TABLE_CUR < TABLE_LENGTH + 1) {
-        console.log('TABLE_CUR\t' + TABLE_CUR);
-        nightmare
-        .click('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') input[name=code_id]')
-        .click('form[name=form1] input[type=button][value="明細"]')
-        .wait('table.EmsDataTable1')
-        .evaluate(function () {
-            return document.querySelector('html').innerHTML;
-        })
-        .then(function (result) {
-            var $       = cheerio.load(result);
-            var date    = $('table.EmsDataTable1:nth-child(1) tr:nth-child(2) td:nth-child(2) font').text();
-            var time1   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(4) td:nth-child(2) font').text();
-            var time2   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(5) td:nth-child(6) font').text();
-            var car_no  = $('form[name=form1] > table.EmsDataTable1 tr:nth-child(1) td:nth-child(2) font').text();
-            var partner = $('table.EmsDataTable1:nth-child(3) tr:nth-child(3) td:nth-child(2) font').text();
-            time1       = time1.split(':')[0].substr(time1.split(':')[0].length - 2) + ':' + time1.split(':')[1].substr(0 ,2);
-            time2       = time2.split(':')[0].substr(time2.split(':')[0].length - 2) + ':' + time2.split(':')[1].substr(0 ,2);
-            car_no      = car_no.substr(0 ,3);
-            A_DATE[COUNT_ITEM - 1]      = date;
-            A_TIME1[COUNT_ITEM - 1]     = time1;
-            A_TIME2[COUNT_ITEM - 1]     = time2;
-            A_CAR_NO[COUNT_ITEM - 1]    = car_no;
-            
-            if (NURSE_NAME != '%') {
-                partner = partner.replace(NURSE_NAME, '');
-            }
-            partner = partner.replace(/\s\s+/g, ' ');
-            A_PARTNER[COUNT_ITEM - 1]   = partner;
+    // if (TABLE_CUR < TABLE_LENGTH + 1) {
+        // console.log('TABLE_CUR\t' + TABLE_CUR);
+    nightmare
+    .wait('table.EmsDataTable')
+    .evaluate(function () {
+        return document.querySelector('html').innerHTML;
+    })
+    .then(function (result) {
+        var $       = cheerio.load(result);
+        var ext_no = $('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') td:nth-child(3) font').text();
+        console.log(ext_no);
+        if (ext_no == '001') {
+            nightmare
+            .click('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') input[name=code_id]')
+            .click('form[name=form1] input[type=button][value="明細"]')
+            .wait('table.EmsDataTable1')
+            .evaluate(function () {
+                return document.querySelector('html').innerHTML;
+            })
+            .then(function (result) {
+                var $       = cheerio.load(result);
+                var date    = $('table.EmsDataTable1:nth-child(1) tr:nth-child(2) td:nth-child(2) font').text();
+                var time1   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(4) td:nth-child(2) font').text();
+                var time2   = $('table.EmsDataTable1:nth-child(1) tr:nth-child(5) td:nth-child(6) font').text();
+                var car_no  = $('form[name=form1] > table.EmsDataTable1 tr:nth-child(1) td:nth-child(2) font').text();
+                var partner = $('table.EmsDataTable1:nth-child(3) tr:nth-child(3) td:nth-child(2) font').text();
+                time1       = time1.split(':')[0].substr(time1.split(':')[0].length - 2) + ':' + time1.split(':')[1].substr(0 ,2);
+                time2       = time2.split(':')[0].substr(time2.split(':')[0].length - 2) + ':' + time2.split(':')[1].substr(0 ,2);
+                car_no      = car_no.substr(0 ,3);
+                A_DATE[COUNT_ITEM - 1]      = date;
+                A_TIME1[COUNT_ITEM - 1]     = time1;
+                A_TIME2[COUNT_ITEM - 1]     = time2;
+                A_CAR_NO[COUNT_ITEM - 1]    = car_no;
+                
+                if (NURSE_NAME != '%') {
+                    partner = partner.replace(NURSE_NAME, '');
+                }
+                partner = partner.replace(/\s\s+/g, ' ');
+                A_PARTNER[COUNT_ITEM - 1]   = partner;
 
-            console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no + '\n' + partner);
+                console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no + '\n' + partner);
 
-            WEB_04(COUNT_ITEM - 1, PAGE_CUR);
-            
-            COUNT_ITEM++;
+                WEB_04(COUNT_ITEM - 1, PAGE_CUR);
+                
+                COUNT_ITEM++;
+                TABLE_CUR++;
+                if (TABLE_CUR == 12 ) {
+                    PAGE_CUR++;
+                }
+                PAGE_NEXT_START = ((PAGE_CUR - 1) * 10) + 1;
+                run_NM_6();
+            })
+            .catch(function (error) {
+                console.error('Search failed:', error);
+            });
+        } else {
             TABLE_CUR++;
-            if (TABLE_CUR == 12 && PAGE_CUR != PAGE_LENGTH) {
-                PAGE_CUR++;
-            }
-            PAGE_NEXT_START = ((PAGE_CUR - 1) * 10) + 1;
-            run_NM_6();
-        })
-        .catch(function (error) {
-            console.error('Search failed:', error);
-        });
-    }
+            if (TABLE_CUR <= TABLE_LENGTH) {
+                run_NM_5();
+            } else {
+                if (TABLE_CUR == 12 ) {
+                    PAGE_CUR++;
+                }
+                PAGE_NEXT_START = ((PAGE_CUR - 1) * 10) + 1;
+                run_NM_6();
+            }            
+        }
+    })
+    .catch(function (error) {
+        console.error('Search failed:', error);
+    });
+    // }
 }
 var run_NM_6 = function () { /******************* GO BACK ***************************/
     nightmare
     .goto('http://ems.mohw.gov.tw/AidCase/AidCaseMTSelect.jsp?start=' + PAGE_NEXT_START)
     .then(function () {
-        if (TABLE_CUR == 12 && !(PAGE_CUR > PAGE_LENGTH)) { //change page
+        if(TABLE_CUR <= TABLE_LENGTH && PAGE_CUR <= PAGE_LENGTH) {
+            run_NM_5();
+        } else if (TABLE_CUR == 12 && !(PAGE_CUR > PAGE_LENGTH)) { //change page
             run_NM_4();
-        } else if(TABLE_CUR == (TABLE_LENGTH + 1) && PAGE_CUR == PAGE_LENGTH) {
+        // } else if(TABLE_CUR == (TABLE_LENGTH + 1) && PAGE_CUR == PAGE_LENGTH) {
+        } else {
             console.log('DONE!');
             // run_NM_7();
-        } else {
-            run_NM_5();
         }
     })
     .catch(function (error) {
