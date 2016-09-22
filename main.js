@@ -45,7 +45,7 @@ ipc.on('save-dialog', function (event) {
 		title: '另存新檔',
 		defaultPath: 'Overtime.pdf',
 		filters: [
-			{ name: 'PDF', extensions: ['pdf'] }
+			{ name: '可攜式文件格式(PDF)', extensions: ['pdf'] }
 		]
 	}
 	dialog.showSaveDialog(options, function (filename) {

@@ -1,37 +1,55 @@
 #body {
-  background-color: #F2F2F2;
-  font-family: "PingFang-TC", "Microsoft JhengHei", "Arial";
+    background-color: #F2F2F2;
+    font-family: "PingFang-TC", "Microsoft JhengHei", "Arial";
 }
 #Nurse_Id {
-  font-family: "PingFang-TC", "Microsoft JhengHei", "Arial";
+    font-family: "PingFang-TC", "Microsoft JhengHei", "Arial";
 }
 .form-signin .form-control:focus {
-  z-index: 2;
+    z-index: 2;
 }
 #div_search_result_button {
-  float: right;
+    float: right;
 }
 @media print {
-	#div_search_result_button {
-		display: none;
-	}
-  #div_search_result {
-    display: block;
-  }
-  #pane, button {
-    display: none;
-  }
+    #div_search_result_button {
+        display: none;
+    }
+    #div_search_result {
+        display: block;
+    }
+    #pane, button {
+        display: none;
+    }
+    #partner {
+        white-space: nowrap;
+    }
 }
 .center {
-  top: 150px;
-  position: relative;
-  margin-right: auto;
-  margin-left:  auto;
-  clear:both;
+    top: 150px;
+    position: relative;
+    margin-right: auto;
+    margin-left:  auto;
+    clear:both;
 }
 .combobox {
-  max-width: 350px;
+    max-width: 350px;
 }
 #s2_mode {
-  margin: 0;
+    margin: 0;
+}
+#partner {
+    white-space: nowrap;
+}
+#search-ring {
+    float: left;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+#div_search_result_button {
+    margin-buttom: 50px;
+}
+#overtime_chk {
+    float: left;
+    margin-right: 10px;
 }

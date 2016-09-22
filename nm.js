@@ -39,6 +39,10 @@ searchBtn.addEventListener('click', function (event) {
 })
 researchBtn.addEventListener('click', function (event) {
     WEB_02();
+    saveBtn.disabled = true;
+    researchBtn.disabled = true;
+    document.getElementById('overtime').disabled = true;
+    document.getElementById('overtime').checked = false;
     var num = document.getElementById("table_result").rows.length;
     for (var i = 1; i < num; i++) {
         document.getElementById("table_result").deleteRow(-1);
@@ -99,10 +103,10 @@ var WEB_03 = function () {
     document.getElementById('div_search').style.display = 'none';
     document.getElementById('div_search_text').style.display = '';
 }
-var WEB_04 = function (i, j) {
+var WEB_04_FILL_TABLE = function (i, j) {
     document.getElementById('div_search_text').style.display = 'none';
     document.getElementById('div_search_result').style.display = '';
-
+    document.getElementById('search-ring').style.display = '';
     var num = document.getElementById('table_result').rows.length;
     var tr  = document.getElementById('table_result').insertRow(num);
     var td;
@@ -122,12 +126,16 @@ var WEB_04 = function (i, j) {
     td.innerHTML = CALC_H2(i);
     td = tr.insertCell(-1);
     td.innerHTML = A_PARTNER[i];
+    td.style.whiteSpace = "nowrap"
     if (STATION_2_MODE) {
         td = tr.insertCell(-1);
         td.innerHTML = CALC_I(i);
     }
     if (CALC_H2(i) > 0) {
         document.querySelector('tr:nth-child(' + (num+1) + ')').style.backgroundColor = '#3393df';
+        document.querySelector('tr:nth-child(' + (num+1) + ')').classList.add('overtime');
+    } else {
+        // document.querySelector('tr:nth-child(' + (num+1) + ')').classList.add('notovertime');
     }
 }
 var WEB_05_NO_RESULT = function () {
@@ -293,8 +301,6 @@ var run_NM_4 = function () { /******************* GET TABLE LENGTH *************
     });
 }
 var run_NM_5 = function () {
-    // if (TABLE_CUR < TABLE_LENGTH + 1) {
-        // console.log('TABLE_CUR\t' + TABLE_CUR);
     nightmare
     .wait('table.EmsDataTable')
     .evaluate(function () {
@@ -303,7 +309,6 @@ var run_NM_5 = function () {
     .then(function (result) {
         var $       = cheerio.load(result);
         var ext_no = $('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') td:nth-child(3) font').text();
-        console.log(ext_no);
         if (ext_no == '001') {
             nightmare
             .click('form[name=form1] table tr:nth-child(' + TABLE_CUR + ') input[name=code_id]')
@@ -333,9 +338,9 @@ var run_NM_5 = function () {
                 partner = partner.replace(/\s\s+/g, ' ');
                 A_PARTNER[COUNT_ITEM - 1]   = partner;
 
-                console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no + '\n' + partner);
+                console.log('date:\t' + date + '\ntime1:\t' + time1 + '\ntime2:\t' + time2 + '\ncar_no:\t' + car_no);
 
-                WEB_04(COUNT_ITEM - 1, PAGE_CUR);
+                WEB_04_FILL_TABLE(COUNT_ITEM - 1, PAGE_CUR);
                 
                 COUNT_ITEM++;
                 TABLE_CUR++;
@@ -364,7 +369,6 @@ var run_NM_5 = function () {
     .catch(function (error) {
         console.error('Search failed:', error);
     });
-    // }
 }
 var run_NM_6 = function () { /******************* GO BACK ***************************/
     nightmare
@@ -377,7 +381,10 @@ var run_NM_6 = function () { /******************* GO BACK **********************
         // } else if(TABLE_CUR == (TABLE_LENGTH + 1) && PAGE_CUR == PAGE_LENGTH) {
         } else {
             console.log('DONE!');
-            // run_NM_7();
+            saveBtn.disabled = false;
+            researchBtn.disabled = false;
+            document.getElementById('overtime').disabled = false;
+            document.getElementById('search-ring').style.display = 'none';
         }
     })
     .catch(function (error) {
@@ -406,7 +413,6 @@ var target_dates = function () {
     TARGET_YEAR1    = ('0' + TARGET_YEAR1).slice(-3);
     TARGET_YEAR2    = ('0' + TARGET_YEAR2).slice(-3);
     run_NM_2();
-    // run_NM_1_4();
 }
 var CALC_E = function (i) {
     var e_time1 = new Date('1992/08/30 ' + A_TIME1[i] + ':00').getTime();
