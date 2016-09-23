@@ -11,6 +11,7 @@ const LengthSlt     = document.getElementById('length');
 // const Station_2Chk  = document.getElementById('Station_2');
 const Car_NoIpt     = document.getElementById('Car_No');
 const S2_MODE       = document.getElementById('s2_mode');
+const WebLink       = document.getElementById('website');
 const ipc           = require('electron').ipcRenderer;
 var USER_ID, USER_PW, NURSE_ID, INPUT_YEAR, INPUT_MONTH, INPUT_LENGTH, STATION_2_MODE = false, CAR_NO, NURSE_NAME;
 var COOKIE, COUNT_ITEM = 1, TARGET_YEAR1, TARGET_YEAR2, TARGET_MONTH1, TARGET_MONTH2, TABLE_LENGTH, TABLE_CUR, PAGE_LENGTH, PAGE_CUR, PAGE_NEXT_START;
@@ -49,6 +50,9 @@ researchBtn.addEventListener('click', function (event) {
     }
     A_DATE = [], A_TIME1 = [], A_TIME2 = [], A_CAR_NO = [], A_OVERTIME = [], A_PARTNER = [];
     COUNT_ITEM = 1;
+})
+WebLink.addEventListener('click', function (event) {
+    ipc.send('open-website');
 })
 // Station_2Chk.addEventListener('change', function(event) {
 //     if (document.getElementById('Station_2').checked == true) {
@@ -126,7 +130,7 @@ var WEB_04_FILL_TABLE = function (i, j) {
     td.innerHTML = CALC_H2(i);
     td = tr.insertCell(-1);
     td.innerHTML = A_PARTNER[i];
-    td.style.whiteSpace = "nowrap"
+    td.style.whiteSpace = "nowrap";
     if (STATION_2_MODE) {
         td = tr.insertCell(-1);
         td.innerHTML = CALC_I(i);
@@ -134,8 +138,6 @@ var WEB_04_FILL_TABLE = function (i, j) {
     if (CALC_H2(i) > 0) {
         document.querySelector('tr:nth-child(' + (num+1) + ')').style.backgroundColor = '#3393df';
         document.querySelector('tr:nth-child(' + (num+1) + ')').classList.add('overtime');
-    } else {
-        // document.querySelector('tr:nth-child(' + (num+1) + ')').classList.add('notovertime');
     }
 }
 var WEB_05_NO_RESULT = function () {

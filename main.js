@@ -66,3 +66,6 @@ ipc.on('print-to-pdf', function (event, path) {
 		})
 	})
 })
+ipc.on('open-website', function (event) {
+    shell.openExternal('https://shiaofang.blogspot.tw');
+})
