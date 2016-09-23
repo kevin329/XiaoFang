@@ -160,6 +160,15 @@ var WEB_06_RESET = function (msg) {
         document.getElementById('div_msg').style.display = '';
     }
 }
+var WEB_07_RESULT_SUBTITLE = function () {
+    var subtitle;
+    if (INPUT_LENGTH == 1) {
+        subtitle = NURSE_NAME + ' ' + TARGET_MONTH1 + ' 月';
+    } else {
+        subtitle = NURSE_NAME + ' ' + TARGET_MONTH1 + ' 到 ' + TARGET_MONTH2 + ' 月';
+    }
+    document.getElementById('subtitle_result').innerHTML = subtitle;
+}
 var run_NM_1 = function () {
     nightmare
     .goto('https://220.228.12.173/')
@@ -247,6 +256,7 @@ var run_NM_2 = function () {
         var $       = cheerio.load(result);
         NURSE_NAME  = $('select[name=nurse_code] option[value=\"' + NURSE_ID + '\"]').text();//name
         console.log(NURSE_NAME);
+        WEB_07_RESULT_SUBTITLE();
         run_NM_2_1();
     })
     .catch(function (error) {

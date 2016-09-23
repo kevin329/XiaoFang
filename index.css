@@ -2,7 +2,7 @@
     background-color: #F2F2F2;
     font-family: "蘋方-繁", "PingFang-TC", "Microsoft JhengHei", "Arial" !important;
 }
-#title_login, #login, #title_search, #search, #title_about, #ring1, #ring2, #title_resault, #table_result th, #s2_mode span, #search_again, #save_button {
+#title_login, #login, #title_search, #search, #title_about, #ring1, #ring2, #title_resault, #table_result th, #s2_mode span, #search_again, #save_button, #subtitle_result {
     font-family: "sans-serif", "蘋方-繁", "PingFang-TC", "Microsoft JhengHei" !important;
 }
 #Nurse_Id {
@@ -18,7 +18,7 @@
     float: right;
 }
 @media print {
-    #div_search_result_button {
+    #div_search_result_button, #title_resault {
         display: none;
     }
     #div_search_result {
