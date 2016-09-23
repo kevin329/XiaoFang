@@ -3,10 +3,13 @@
     font-family: "蘋方-繁", "PingFang-TC", "Microsoft JhengHei", "Arial" !important;
 }
 #title_login, #login, #title_search, #search, #title_about, #ring1, #ring2, #title_resault, #table_result th, #s2_mode span, #search_again, #save_button {
-  font-family: "sans-serif", "蘋方-繁", "PingFang-TC", "Microsoft JhengHei" !important;
+    font-family: "sans-serif", "蘋方-繁", "PingFang-TC", "Microsoft JhengHei" !important;
 }
 #Nurse_Id {
     font-family: "PingFang-TC", "Microsoft JhengHei", "Arial";
+}
+#div_login {
+    margin-top: 100px;
 }
 .form-signin .form-control:focus {
     z-index: 2;
@@ -39,7 +42,8 @@
     max-width: 350px;
 }
 #s2_mode {
-    margin: 0;
+    margin-top: -5px;
+    margin-bottom: 5px;
 }
 #partner {
     white-space: nowrap;
@@ -50,9 +54,12 @@
     margin-right: 10px;
 }
 #div_search_result_button {
-    margin-buttom: 50px;
+    margin-bottom: 50px;
 }
 #overtime_chk {
     float: left;
     margin-right: 10px;
+}
+#div_search label {
+    margin-top: 11px;
 }
