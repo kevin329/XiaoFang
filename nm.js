@@ -113,6 +113,7 @@ var WEB_04_FILL_TABLE = function (i, j) {
     document.getElementById('search-ring').style.display = '';
     var num = document.getElementById('table_result').rows.length;
     var tr  = document.getElementById('table_result').insertRow(num);
+    tr.style.whiteSpace = "nowrap";
     var td;
     td = tr.insertCell(-1);
     td.innerHTML = (i + 1);
@@ -130,7 +131,6 @@ var WEB_04_FILL_TABLE = function (i, j) {
     td.innerHTML = CALC_H2(i);
     td = tr.insertCell(-1);
     td.innerHTML = A_PARTNER[i];
-    td.style.whiteSpace = "nowrap";
     if (STATION_2_MODE) {
         td = tr.insertCell(-1);
         td.innerHTML = CALC_I(i);
@@ -148,6 +148,10 @@ var WEB_05_NO_RESULT = function () {
     td = tr.insertCell(-1);
     td.innerHTML = 'No case found.';
     document.querySelector('tr:nth-child(2) td').colSpan = '9';
+    saveBtn.disabled = false;
+    researchBtn.disabled = false;
+    document.getElementById('overtime').disabled = false;
+    document.getElementById('search-ring').style.display = 'none';
 }
 var WEB_06_RESET = function (msg) {
     document.getElementById('div_login').style.display = '';
